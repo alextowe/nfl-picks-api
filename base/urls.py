@@ -1,11 +1,11 @@
 from django.urls import path
 
-from .views import index, home, signup, login_user, logout_user
+from .views import index, logout_user, profile, settings, delete_user
 
 urlpatterns = [
     path('', index, name='index'),
-    path('home/', home, name='home'),
-    path('signup/', signup, name='signup'),
-    path('login/', login_user, name='login'),
-    path('signout/', logout_user, name='logout'),
+    path('logout/', logout_user, name='logout'),
+    path('profile/', profile, name='profile'),
+    path('settings/', settings, name='settings'),
+    path('delete/<int:id>', delete_user, name='delete'),
 ]
