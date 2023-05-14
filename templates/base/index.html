@@ -29,6 +29,7 @@
             
                                 {% for field in login_form reversed %}
     						        <div class="form-group mb-4">
+                                        {{ field.label }}
                                         {{ field }}
                                     </div>
                                 {% endfor %}
@@ -45,6 +46,7 @@
                                 
                                 {% for field in register_form %}
     						        <div class="form-group mb-4">
+                                        {{ field.label }}
                                         {{ field }}
                                     </div>
                                 {% endfor %}

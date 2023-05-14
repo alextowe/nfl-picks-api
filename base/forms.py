@@ -6,16 +6,16 @@ from.models import User
 class RegistrationForm(UserCreationForm):
     username = forms.CharField(widget=forms.TextInput(
         attrs = {'class': 'form-control', 'placeholder': 'Username'}
-    ), label='')
+    ), label='Username')
     email = forms.EmailField(widget=forms.EmailInput(
         attrs = {'class': 'form-control', 'autocomplete':'username', 'placeholder': 'Email address'}
-    ), label='')
+    ), label='Email')
     password1 = forms.CharField(widget=forms.PasswordInput(
         attrs={'class':'form-control', 'placeholder': 'Password'}
-    ), label='')
+    ), label='Password')
     password2 = forms.CharField(widget=forms.PasswordInput(
         attrs={'class':'form-control', 'placeholder': 'Confirm password'}
-    ), label='')
+    ), label='Confirm password')
     
     class Meta:
         model = User        
@@ -31,10 +31,10 @@ class RegistrationForm(UserCreationForm):
 class LoginForm(AuthenticationForm):
     email = forms.EmailField(widget=forms.EmailInput(
         attrs = {'class': 'form-control', 'placeholder': 'Email address'}
-    ), label='')
+    ), label='Email address')
     password = forms.CharField(widget=forms.PasswordInput(
         attrs={'class':'form-control', 'placeholder': 'Password'}
-    ), label='')
+    ), label='Password')
     
     class Meta:
         model = User
