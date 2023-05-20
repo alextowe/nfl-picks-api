@@ -4,12 +4,12 @@
 		    <div class="row">
 			    <div class="col-md-12">
                     <a href="
-                        {% with user.username|add:'/settings/' as user_settings %}
-                        {% if request.path == user_settings %}
-                            {% url 'index' %}
-                        {% else %}
-                            {{ request.META.HTTP_REFERER|escape }}
-                        {% endif %}
+                        {% with '/settings/'|add:user.username|add:'/' as user_settings and '/profile/'|add:user.username|add:'/' as user_profile' %}
+                            {% if request.path == user_settings or request.path == user_profile %}
+                                {% url 'index' %}
+                            {% else %}
+                                {{ request.META.HTTP_REFERER|escape }}
+                            {% endif %}
                         {% endwith %}">
                         <i class="fa-solid fa-arrow-left fa-xl text-dark"></i>
                     </a>
