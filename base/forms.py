@@ -1,9 +1,11 @@
 from django import forms
 from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm, PasswordResetForm, SetPasswordForm
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from.models import User
+
+
 
 class RegisterForm(UserCreationForm):
     username = forms.CharField(widget=forms.TextInput(
@@ -11,7 +13,7 @@ class RegisterForm(UserCreationForm):
     ), label='Username')
     email = forms.EmailField(widget=forms.EmailInput(
         attrs = {'autocomplete':'username', 'placeholder': 'Email address'}
-    ), label='Email')
+    ), label='Email address')
     password1 = forms.CharField(widget=forms.PasswordInput(
         attrs={'placeholder': 'Password'}
     ), label='Password')
@@ -21,7 +23,7 @@ class RegisterForm(UserCreationForm):
    
     field_order = ('username', 'email', 'password1', 'password2')
     class Meta:
-        model = User        
+        model = get_user_model()        
         fields = ('username', 'email', 'password1', 'password2')
 
     def __init__(self, *args, **kwargs):
@@ -39,6 +41,8 @@ class RegisterForm(UserCreationForm):
             user.save()
         return user
 
+
+
 class LoginForm(AuthenticationForm):
     email = forms.EmailField(widget=forms.EmailInput(
         attrs = {'autocomplete': 'username', 'placeholder': 'Email address'}
@@ -50,7 +54,7 @@ class LoginForm(AuthenticationForm):
     field_order = ('email', 'password')
     
     class Meta:
-        model = User
+        model = get_user_model()
         fields = ('email', 'password')
 
     def __init__(self, *args, **kwargs):
@@ -62,15 +66,108 @@ class LoginForm(AuthenticationForm):
         self.helper.form_method = 'post'
         self.helper.add_input(Submit('bubmit', 'Submit', css_class = 'btn btn-dark'))
 
-class ChangePasswordForm(PasswordChangeForm):
+
+
+class UpdateEmailForm(forms.ModelForm):
+    email = forms.EmailField(widget=forms.EmailInput(
+        attrs = {'autocomplete': 'username', 'placeholder': 'Email address'}
+    ), label='Email address')
+    
+    class Meta:
+        model = get_user_model()
+        fields = ('email',)
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateEmailForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_id = 'id_update_email_form'
+        self.helper.form_class = 'form'
+        self.helper.form_method = 'post'
+        self.helper.add_input(Submit('update_email_button', 'Submit', css_class = 'btn btn-dark'))
+
+
+
+class UpdatePasswordForm(PasswordChangeForm):
+    old_password = forms.CharField(widget=forms.PasswordInput(
+        attrs={'placeholder': 'Old password'}
+    ), label='Old password')
+    
+    new_password1 = forms.CharField(widget=forms.PasswordInput(
+        attrs={'placeholder': 'New password'}
+    ), label='New password')
+    
+    new_password2 = forms.CharField(widget=forms.PasswordInput(
+        attrs={'placeholder': 'Confirm new password'}
+    ), label='Confirm new password')
+
     class Meta:
         model = get_user_model()
         fields = ('old_password', 'new_password1', 'new_password2')
 
     def __init__(self, *args, **kwargs):
-        super(ChangePasswordForm, self).__init__(*args, **kwargs)
+        super(UpdatePasswordForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
-        self.helper.form_id = 'id_change_password_form'
+        self.helper.form_id = 'id_update_password_form'
         self.helper.form_class = 'form'
         self.helper.form_method = 'post'
-        self.helper.add_input(Submit('change_password_button', 'Submit', css_class = 'btn btn-dark'))
+        self.helper.add_input(Submit('update_password_button', 'Submit', css_class = 'btn btn-dark'))
+
+
+
+class ResetPasswordRequestForm(PasswordResetForm):
+    email = forms.EmailField(widget=forms.EmailInput(
+        attrs = {'autocomplete': 'username', 'placeholder': 'Email address'}
+    ), label='Email address')
+    
+    class Meta:
+        model = get_user_model()
+        fields = ('email',)
+
+    def __init__(self, *args, **kwargs):
+        super(ResetPasswordRequestForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_id = 'id_reset_password_request_form'
+        self.helper.form_class = 'form'
+        self.helper.form_method = 'post'
+        self.helper.add_input(Submit('reset_password_request_button', 'Submit', css_class = 'btn btn-dark'))
+
+
+
+class ResetPasswordForm(SetPasswordForm):
+    new_password1 = forms.CharField(widget=forms.PasswordInput(
+        attrs={'placeholder': 'Password'}
+    ), label='Password')
+    
+    new_password2 = forms.CharField(widget=forms.PasswordInput(
+        attrs={'placeholder': 'Confirm password'}
+    ), label='Confirm password')
+    
+    class Meta:
+        model = get_user_model()
+        fields = ('new_password1', 'new_password2')
+
+    def __init__(self, *args, **kwargs):
+        super(ResetPasswordForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_id = 'id_reset_password_form'
+        self.helper.form_class = 'form'
+        self.helper.form_method = 'post'
+        self.helper.add_input(Submit('reset_password_button', 'Submit', css_class = 'btn btn-dark'))
+
+
+
+class DeleteAccountForm(forms.ModelForm):
+    class Meta:
+        model = get_user_model()
+        fields = ()
+
+    def __init__(self, *args, **kwargs):
+        super(DeleteAccountForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_id = 'id_delete_account_form'
+        self.helper.form_class = 'form'
+        self.helper.form_method = 'post'
+        self.helper.add_input(Submit('delete_account_button', 'Yes, delete account', css_class = 'btn btn-danger'))
+
+
+
