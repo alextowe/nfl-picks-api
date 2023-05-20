@@ -20,9 +20,9 @@
           <ul class="dropdown-menu dropdown-menu-dark">
               <li><a class="dropdown-item" href="{% url 'index' %}">
                     <i class="fa-solid fa-house me-3"></i>Home</a></li>
-              <li><a class="dropdown-item" href="{% url 'profile' %}">
+              <li><a class="dropdown-item" href="{% url 'profile' user.username %}">
                     <i class="fa-solid fa-user me-3"></i>My Profile</a></li>
-              <li><a class="dropdown-item" href="{% url 'settings' %}">
+              <li><a class="dropdown-item" href="{% url 'settings' user.username %}">
                     <i class="fa-solid fa-gear me-3"></i>Settings</a></li>
             <li><hr class="dropdown-divider"></li>
             <li>

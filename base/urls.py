@@ -1,11 +1,8 @@
 from django.urls import path
-
-from .views import index, logout_user, profile, settings, delete_user
-
+from .views import LoginUser, HomeView, logout_user
+from .forms import LoginForm
 urlpatterns = [
-    path('', index, name='index'),
+    path('', HomeView.as_view(), name='index'),
+    path('login/', LoginUser.as_view(), name='login'),
     path('logout/', logout_user, name='logout'),
-    path('profile/', profile, name='profile'),
-    path('settings/', settings, name='settings'),
-    path('delete/<int:id>', delete_user, name='delete'),
 ]

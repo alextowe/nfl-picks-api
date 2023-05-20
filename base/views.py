@@ -1,49 +1,37 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
-from .forms import RegistrationForm, LoginForm
+from django.contrib.auth import logout
+from django.contrib.auth.views import LoginView
+from django.views.generic.base import TemplateView
 from django.contrib import messages
-from django.contrib.auth.forms import AuthenticationForm
-
 from .models import User
+from .forms import RegisterForm, LoginForm
 
-def index(request):
-    context = {}
-    login_form = LoginForm()
-    register_form = RegistrationForm()
-    template = 'index.html'
-    if request.user.is_authenticated:
-        template = 'home.html'
-    else:
-        if request.method == "POST":
-            if 'register-button' in request.POST:
-                register_form = RegistrationForm(request.POST)
-                if register_form.is_valid():
-                    user = register_form.save()
-                    login(request, user)
-                    messages.success(request, "Success! You are now registered!")
-                    template = 'home.html'
-                else:
-                    register_form = RegistrationForm()
+class LoginUser(LoginView):
+    authentication_form = LoginForm
+    template_name = 'base/login.html'
+    next_page = 'index' 
+    
+    def post(self, request, *args, **kwargs):
+        """
+        Handle POST requests: instantiate a form instance with the passed
+        POST variables and then check if it's valid.
+        """
+        form = self.get_form()
+        print(form)
+        if form.is_valid():
+            print("Valid")
+            print(form.get_user())
+            return self.form_valid(form)
+        else:
+            print("Invalid")
+            return self.form_invalid(form)
 
-            if 'signin-button' in request.POST:
-                login_form = LoginForm(request, data=request.POST)
-                if login_form.is_valid():
-                    email = request.POST['email']
-                    password = request.POST['password']
-                    user = authenticate(request, email=email, password=password)
-                    if user is not None:
-                        login(request, user)
-                        messages.info(request, f'You are now logged in.')
-                        template = 'home.html'
-                    else:
-                        messages.error(request,'Invalid username or password.')
-                else:
-                    messages.error(request, "Invalid username or password.")
-    context = {
-        'register_form': register_form,
-        'login_form': login_form,
-    }
-    return render(request, f'base/{template}', context)
+
+
+
+class HomeView(TemplateView):
+    template_name = 'base/home.html'
+
 
 def logout_user(request):
     if request.method == "POST":
@@ -51,20 +39,4 @@ def logout_user(request):
         messages.success(request, 'You are now logged out.')
     return redirect('/')
 
-def profile(request):
-    context = {
 
-    }
-    return render(request, 'base/profile.html', context)
-
-def settings(request):
-    context = {
-
-    }
-    return render(request, 'base/settings.html', context)
-
-def delete_user(request, id):
-    print(request.method)
-    user = User.objects.get(id=id)
-    user.delete()
-    return redirect('/')

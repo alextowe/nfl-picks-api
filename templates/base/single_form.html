@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% load crispy_forms_tags %}
+
+{% block title %}  {% endblock %}
+		
+{% block content %}
+	<!-- Form Section -->	
+	<section id="form-section" class="py-5">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-4 offset-lg-4">
+                    <h2 class="mb-4">{{ title }}</h2>
+                    {% include 'partials/_alerts.html' %}
+                    {% crispy form %}                    
+                </div>
+			</div>	
+		</div>
+	</section>
+{% endblock %}
