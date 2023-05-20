@@ -5,7 +5,8 @@
 {% block title %} | Settings {% endblock%}
 
 {% block content %}
-<section id="settings" class="py-5">
+<!--Settings Section -->
+<section id="settings" class="my-5">
     <div class="container">
         <div class="row">
             <div class="col-md-12">
@@ -13,19 +14,24 @@
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item mb-5 p-0 pb-5 border-bottom border-secondary">
                             <h2 class="mb-4">Update Email Address</h2>
+                            <p>Click the button below to update your email address.</p>
                             <p>Current Email: {{ user.email }}</p>
                             <a class="btn btn-dark"href="{% url 'update-email' user.username %}">Update Email</a>
                         </li>
                         <li class="list-group-item mb-5 p-0 pb-5 border-bottom border-secondary">
                             <h2 class="mb-4">Change Password</h2>
+                            <p>Click the button below to update your password. You will be required to provide your current password.</p>
                             <a class="btn btn-dark"href="{% url 'update-password' user.username %}">Update Password</a>
                         </li>
                         <li class="list-group-item mb-5 p-0 pb-5 border-bottom border-secondary">
                             <h2 class="mb-4">Reset Password</h2>
+                            <p>Click the button below to reset your password. Use this if you forgot your current password.</p>
                             <a class="btn btn-dark"href="{% url 'reset-password-request' user.username %}">Reset Password</a>
                         </li>
                         <li class="list-group-item mb-5 p-0 pb-5 border-bottom border-secondary">
                             <h2 class="mb-4">Delete Account</h2>
+                            <p>Click the button below to delete your account.</p>
+                            <a class="btn btn-danger"href="{% url 'delete-account' user.username %}">Delete Account</a>
                         </li>
                     </ul>
                 {% else %}
