@@ -2,8 +2,20 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm, PasswordResetForm, SetPasswordForm
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Submit
+from crispy_forms.layout import Layout, ButtonHolder, BaseInput, Submit
 from.models import User
+
+
+
+class ButtonSubmit(Submit):
+    input_type = 'submit'
+    field_classes = 'btn btn-dark'
+
+
+
+class DangerButtonSubmit(BaseInput):
+    input_type = 'submit'
+    field_classes = 'btn btn-outline-danger'
 
 
 
@@ -32,7 +44,7 @@ class RegisterForm(UserCreationForm):
         self.helper.form_id = 'id_register_form'
         self.helper.form_class = 'form'
         self.helper.form_method = 'post'
-        self.helper.add_input(Submit('register_button', 'Submit', css_class = 'btn btn-dark'))
+        self.helper.add_input(Submit('register_button', 'Submit'))
     
     def save(self, commit=True):
         user = super(RegisterForm, self).save(commit=False)
@@ -64,7 +76,7 @@ class LoginForm(AuthenticationForm):
         self.helper.form_id = 'id_login_form'
         self.helper.form_class = 'form'
         self.helper.form_method = 'post'
-        self.helper.add_input(Submit('bubmit', 'Submit', css_class = 'btn btn-dark'))
+        self.helper.add_input(ButtonSubmit('login_button', 'Submit'))
 
 
 
@@ -83,7 +95,7 @@ class UpdateEmailForm(forms.ModelForm):
         self.helper.form_id = 'id_update_email_form'
         self.helper.form_class = 'form'
         self.helper.form_method = 'post'
-        self.helper.add_input(Submit('update_email_button', 'Submit', css_class = 'btn btn-dark'))
+        self.helper.add_input(ButtonSubmit('update_email_button', 'Submit'))
 
 
 
@@ -110,7 +122,7 @@ class UpdatePasswordForm(PasswordChangeForm):
         self.helper.form_id = 'id_update_password_form'
         self.helper.form_class = 'form'
         self.helper.form_method = 'post'
-        self.helper.add_input(Submit('update_password_button', 'Submit', css_class = 'btn btn-dark'))
+        self.helper.add_input(ButtonSubmit('update_password_button', 'Submit'))
 
 
 
@@ -129,7 +141,7 @@ class ResetPasswordRequestForm(PasswordResetForm):
         self.helper.form_id = 'id_reset_password_request_form'
         self.helper.form_class = 'form'
         self.helper.form_method = 'post'
-        self.helper.add_input(Submit('reset_password_request_button', 'Submit', css_class = 'btn btn-dark'))
+        self.helper.add_input(ButtonSubmit('reset_password_request_button', 'Submit'))
 
 
 
@@ -152,7 +164,7 @@ class ResetPasswordForm(SetPasswordForm):
         self.helper.form_id = 'id_reset_password_form'
         self.helper.form_class = 'form'
         self.helper.form_method = 'post'
-        self.helper.add_input(Submit('reset_password_button', 'Submit', css_class = 'btn btn-dark'))
+        self.helper.add_input(ButtonSubmit('reset_password_button', 'Submit'))
 
 
 
@@ -167,7 +179,10 @@ class DeleteAccountForm(forms.ModelForm):
         self.helper.form_id = 'id_delete_account_form'
         self.helper.form_class = 'form'
         self.helper.form_method = 'post'
-        self.helper.add_input(Submit('delete_account_button', 'Yes, delete account', css_class = 'btn btn-danger'))
-
-
+        self.helper.layout = Layout(
+            ButtonHolder(
+                DangerButtonSubmit('delete_account_button', 'Yes, delete account')
+            ),
+        )
+        
 

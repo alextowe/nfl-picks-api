@@ -76,7 +76,7 @@ class Settings(LoginRequiredMixin, TemplateView):
 
 
 
-class UpdateEmail(SuccessMessageMixin, UpdateView):
+class UpdateEmail(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     template_name = single_form_page
     model = User
     form_class = UpdateEmailForm
@@ -90,7 +90,7 @@ class UpdateEmail(SuccessMessageMixin, UpdateView):
 
 
 
-class UpdatePassword(SuccessMessageMixin, PasswordChangeView):
+class UpdatePassword(LoginRequiredMixin, SuccessMessageMixin, PasswordChangeView):
     template_name = single_form_page
     model = User
     form_class = UpdatePasswordForm
@@ -100,16 +100,15 @@ class UpdatePassword(SuccessMessageMixin, PasswordChangeView):
     
     def get_success_url(self):
         username=self.kwargs['slug']
-        return reverse_lazy('update-password-done', kwargs={'slug': username})
+        return reverse_lazy('settings', kwargs={'slug': username})
 
 
 
-class UpdatePasswordDone(PasswordChangeDoneView):
+class UpdatePasswordDone(LoginRequiredMixin, PasswordChangeDoneView):
     template_name = settings_page
 
 
-
-class ResetPasswordRequest(SuccessMessageMixin, PasswordResetView):
+class ResetPasswordRequest(LoginRequiredMixin, SuccessMessageMixin, PasswordResetView):
     template_name = single_form_page
     model = User
     form_class = ResetPasswordRequestForm
@@ -124,7 +123,7 @@ class ResetPasswordRequest(SuccessMessageMixin, PasswordResetView):
 
 
 
-class ResetPasswordRequestDone(PasswordResetDoneView):
+class ResetPasswordRequestDone(LoginRequiredMixin, PasswordResetDoneView):
     template_name = settings_page
 
 
@@ -143,12 +142,12 @@ class ResetPassword(SuccessMessageMixin, PasswordResetConfirmView):
         return reverse_lazy('login')
 
 
-class ResetPasswordComplete(PasswordResetCompleteView):
+class ResetPasswordComplete(LoginRequiredMixin, PasswordResetCompleteView):
     template_name = messages_page
 
 
 
-class DeleteAccount(SuccessMessageMixin, DeleteView):
+class DeleteAccount(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
     template_name = single_form_page
     model = User
     form_class = DeleteAccountForm
