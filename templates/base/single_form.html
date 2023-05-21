@@ -5,16 +5,16 @@
 {% block title %}  {% endblock %}
 		
 {% block content %}
-<!-- Form Section -->	
-<section id="form-section" class="py-5">
-	<div class="container">
-		<div class="row">
-			<div class="col-lg-4 offset-lg-4">
-                <h2 class="mb-4">{{ title }}</h2>
-                <p>{{ prompt }}<p>
-                {% crispy form %}                    
-            </div>
-		</div>	
-	</div>
-</section>
+    <!-- Form Section -->	
+    <section id="form-section" class="py-5">
+	    <div class="container">
+		    <div class="row">
+			    <div class="col-lg-4 offset-lg-4">
+                    <h2 class="mb-4">{{ title }}</h2>
+                    <p>{{ prompt }}<p>
+                    {% crispy form %}                    
+                </div>
+		    </div>	
+    	</div>
+    </section>
 {% endblock %}

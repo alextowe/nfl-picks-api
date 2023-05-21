@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.views import FormView, LoginView, LogoutView, PasswordChangeView, PasswordChangeDoneView, PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
 from django.views.generic.edit import FormView, CreateView, UpdateView, DeleteView
@@ -9,6 +9,7 @@ from django.contrib import messages
 from django.urls import reverse_lazy, reverse
 from .models import User
 from .forms import RegisterForm, LoginForm, UpdateEmailForm, UpdatePasswordForm, ResetPasswordRequestForm, ResetPasswordForm, DeleteAccountForm
+from django.core.exceptions import ImproperlyConfigured
 
 home_page = 'base/index.html'
 profile_page = 'base/profile.html'
@@ -18,59 +19,82 @@ messages_page = 'base/messages.html'
 
 
 
-class RenderTemplate(LoginRequiredMixin, TemplateView):
+class RedirectIfLoggedInMixin(UserPassesTestMixin):
     """
-    Renders a template for an authenticated user.
+    Redirect to 'redirect_url' if 'test_func()' returns False.
+    """
+
+    redirect_url = 'index'
+    
+    def get_redirect_url(self):
+        """
+        Override this method to override the redirect_url attribute.
+        """
+        redirect_url = self.redirect_url
+        if not redirect_url:
+            raise ImproperlyConfigured(
+                '{0} is missing the redirect_url attribute. Define {0}.redirect_url or override '
+                '{0}.get_redirect_url().'.format(self.__class__.__name__)
+            )
+        return str(redirect_url)
+
+    def handle_no_permission(self):
+        return redirect(self.get_redirect_url())
+
+    def test_func(self):
+        return not self.request.user.is_authenticated
+
+
+class LoggedOutMixin(RedirectIfLoggedInMixin, SuccessMessageMixin):
+    """
+    Mixin for views not requiring user authentication. 
+    """
+
+
+
+class LoggedInMixin(LoginRequiredMixin, SuccessMessageMixin):
+    """
+    Mixin for views requiring user authentication. 
+    """
+
+
+
+class UserLoggedOut(LoggedOutMixin, TemplateView):
+    """
+    Renders a templates for an unauthenticated user. Redirects logged in users.
     """
     template_name = None
 
 
 
-class BaseFormView(SuccessMessageMixin, FormView):
+class UserLoggedIn(LoggedInMixin, TemplateView):
+    """
+    Renders a template for an authenticated user. Required users to be logged in.
+    """
+    template_name = None
+
+
+
+class UserLoggedOutForm(LoggedOutMixin, FormView):
     """
     Base form for an unauthenticated user.
     """
     template_name  = form_page
-    success_url = 'login'
-
-    def get(self, request):
-        if request.user.is_authenticated:
-            return redirect('index')
-        form = self.get_form()
-        return render(request, self.template_name, context={'title': 'Create your account', 'form': form,})
-   
-    def get_success_url(self):
-        """
-        Redirects to 'success_url'.
-        """
-        return reverse_lazy(self.success_url)
+    redirect_url = 'index'
 
 
 
-class BaseUserFormView(LoginRequiredMixin, SuccessMessageMixin, FormView):
+class UserLoggedInForm(LoginRequiredMixin, SuccessMessageMixin ,FormView):
     """
-    Base form for an authenticated user. Requires user to be logged in. 
+    Base form for an authenticated user. 
     """
     model = User
     template_name = form_page
-    success_url = 'settings'
+    success_url = reverse_lazy('settings')
 
 
 
-class SlugUserFormView(BaseUserFormView):
-    """
-    Form view for url paths containing a slug. Slug defaults to username. Redirects to success_url with the given slug.
-    """
-    slug_field = 'username'
-    success_url = 'settings'
-    extra_context = {}
-
-    def get_success_url(self):
-        username=self.kwargs['slug']
-        return reverse_lazy(self.success_url, kwargs={'slug': username})
-
-
-class Home(RenderTemplate):
+class Home(UserLoggedIn):
     """
     Renders the home page.
     """
@@ -78,7 +102,7 @@ class Home(RenderTemplate):
 
 
 
-class Profile(RenderTemplate):
+class Profile(UserLoggedIn):
     """
     Renders the profile page.
     """
@@ -86,15 +110,14 @@ class Profile(RenderTemplate):
 
 
 
-class Settings(RenderTemplate):
+class Settings(UserLoggedIn):
     """
     Renders the settings page.
     """
     template_name = settings_page
 
 
-
-class Register(BaseFormView, CreateView):
+class Register(UserLoggedOutForm, CreateView):
     """
     Renders the register page to create a new user. 
     """
@@ -102,9 +125,22 @@ class Register(BaseFormView, CreateView):
     success_url = 'login'
     extra_context = {'title': 'Create your account'}
     
+    def post(self, request):
+        """
+        Creates a user in on a POST request.
+        """
+        form = self.get_form()
+        if form.is_valid():
+            user = authenticate(
+                email=form.cleaned_data['email'],
+                password=form.cleaned_data['password'],
+            )
+            if user is not None:
+                login(request, user)
 
 
-class Login(BaseFormView, LoginView):
+
+class Login(UserLoggedOutForm, LoginView):
     """
     Renders the login page so a user can login. 
     """
@@ -140,17 +176,18 @@ class Logout(LogoutView):
 
 
 
-class UpdateEmail(SlugUserFormView, UpdateView):
+class UpdateEmail(UserLoggedInForm, UpdateView):
     """
     Renders the update email page so a user can update their email address.
     """
     form_class = UpdateEmailForm
+    slug_field = 'username'
     extra_context = {'title': 'Update your email address', 'prompt': 'Enter your new email address.'}
     success_message = 'You have successfully updated your email!'
     
 
 
-class UpdatePassword(SlugUserFormView, PasswordChangeView):
+class UpdatePassword(UserLoggedInForm, PasswordChangeView):
     """
     Renders the update password page so a user can update their password.
     """
@@ -160,7 +197,7 @@ class UpdatePassword(SlugUserFormView, PasswordChangeView):
     
 
 
-class ResetPasswordRequest(SlugUserFormView, PasswordResetView):
+class ResetPasswordRequest(UserLoggedInForm, PasswordResetView):
     """
     Renders the reset password request page to request a password reset link be sent to users email.
     """
@@ -172,7 +209,15 @@ class ResetPasswordRequest(SlugUserFormView, PasswordResetView):
     
 
 
-class ResetPassword(SlugUserFormView, PasswordResetConfirmView):
+class ResetPasswordRequestDone(TemplateView):
+    """
+    Renders the confirmation page for reset password request.
+    """
+    template_name = messages_page 
+
+
+
+class ResetPassword(UserLoggedOutForm, PasswordResetConfirmView):
     """
     Renders the reset password page so a user can create a new password. Redirects to login page. 
     """
@@ -185,11 +230,11 @@ class ResetPassword(SlugUserFormView, PasswordResetConfirmView):
 
 
 
-class DeleteAccount(SlugUserFormView, DeleteView):
+class DeleteAccount(UserLoggedInForm, DeleteView):
     """
     Renders the delete account page so a user can delete their account.
     """
     form_class = DeleteAccountForm
+    slug_field = 'username'
     extra_context = {'title': 'Are you sure? It cannot be recovered.'}
-    success_url = reverse_lazy('login')
     success_message = 'You have successfully deleted your account!' 

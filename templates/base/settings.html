@@ -21,12 +21,12 @@
                         <li class="list-group-item mb-5 p-0 pb-5 border-bottom border-secondary">
                             <h2 class="mb-4">Change Password</h2>
                             <p>Click the button below to update your password. You will be required to provide your current password.</p>
-                            <a class="btn btn-dark"href="{% url 'update-password' user.username %}">Update Password</a>
+                            <a class="btn btn-dark"href="{% url 'update-password' %}">Update Password</a>
                         </li>
                         <li class="list-group-item mb-5 p-0 pb-5 border-bottom border-secondary">
                             <h2 class="mb-4">Reset Password</h2>
                             <p>Click the button below to reset your password. Use this if you forgot your current password.</p>
-                            <a class="btn btn-dark"href="{% url 'reset-password-request' user.username %}">Reset Password</a>
+                            <a class="btn btn-dark"href="{% url 'reset-password-request' %}">Reset Password</a>
                         </li>
                         <li class="list-group-item mb-5 p-0 pb-5 border-bottom border-secondary">
                             <h2 class="mb-4">Delete Account</h2>

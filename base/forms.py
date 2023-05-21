@@ -8,32 +8,57 @@ from.models import User
 
 
 class ButtonSubmit(Submit):
+    """
+    Creates a submit button. 
+    """
     input_type = 'submit'
     field_classes = 'btn btn-dark'
 
 
 
-class DangerButtonSubmit(BaseInput):
-    input_type = 'submit'
+class DangerButtonSubmit(ButtonSubmit):
+    """
+    Creates a danger submit button. 
+    """
     field_classes = 'btn btn-outline-danger'
 
 
 
+class InputField(BaseInput):
+    """
+    Creates an instance of an input field. 
+    """
+    field_classes = '' 
+    field_order = ()
+
+    def create_field_list(self):
+        for field in self.field_order:
+            print(field)
+
+
+
 class RegisterForm(UserCreationForm):
-    username = forms.CharField(widget=forms.TextInput(
+    """
+    Creates a user creation form. 
+    """
+    username = forms.EmailField(widget=forms.EmailInput(
         attrs = {'placeholder': 'Username'}
     ), label='Username')
+    
     email = forms.EmailField(widget=forms.EmailInput(
         attrs = {'autocomplete':'username', 'placeholder': 'Email address'}
     ), label='Email address')
+
     password1 = forms.CharField(widget=forms.PasswordInput(
         attrs={'placeholder': 'Password'}
     ), label='Password')
+
     password2 = forms.CharField(widget=forms.PasswordInput(
         attrs={'placeholder': 'Confirm password'}
     ), label='Confirm password')
-   
+
     field_order = ('username', 'email', 'password1', 'password2')
+    
     class Meta:
         model = get_user_model()        
         fields = ('username', 'email', 'password1', 'password2')
@@ -44,7 +69,7 @@ class RegisterForm(UserCreationForm):
         self.helper.form_id = 'id_register_form'
         self.helper.form_class = 'form'
         self.helper.form_method = 'post'
-        self.helper.add_input(ButtonSubmit('register_button', 'Submit'))
+        self.helper.add_input(ButtonSubmit('submit_button', 'Submit'))
     
     def save(self, commit=True):
         user = super(RegisterForm, self).save(commit=False)
@@ -56,17 +81,21 @@ class RegisterForm(UserCreationForm):
 
 
 class LoginForm(AuthenticationForm):
+    """
+    Creates a user login form. 
+    """
+    field_order = ('email', 'password')
+    
     email = forms.EmailField(widget=forms.EmailInput(
-        attrs = {'autocomplete': 'username', 'placeholder': 'Email address'}
+        attrs = {'autocomplete':'username', 'placeholder': 'Email address'}
     ), label='Email address')
+
     password = forms.CharField(widget=forms.PasswordInput(
         attrs={'placeholder': 'Password'}
     ), label='Password')
-    
-    field_order = ('email', 'password')
-    
+
     class Meta:
-        model = get_user_model()
+        #model = get_user_model()
         fields = ('email', 'password')
 
     def __init__(self, *args, **kwargs):
@@ -76,14 +105,19 @@ class LoginForm(AuthenticationForm):
         self.helper.form_id = 'id_login_form'
         self.helper.form_class = 'form'
         self.helper.form_method = 'post'
-        self.helper.add_input(ButtonSubmit('login_button', 'Submit'))
+        self.helper.add_input(ButtonSubmit('submit_button', 'Submit'))
 
 
 
 class UpdateEmailForm(forms.ModelForm):
+    """
+    Creates an update email form. 
+    """
     email = forms.EmailField(widget=forms.EmailInput(
         attrs = {'autocomplete': 'username', 'placeholder': 'Email address'}
     ), label='Email address')
+    
+    field_order = ('email',)
     
     class Meta:
         model = get_user_model()
@@ -100,9 +134,13 @@ class UpdateEmailForm(forms.ModelForm):
 
 
 class UpdatePasswordForm(PasswordChangeForm):
+    """
+    Creates an update password form. 
+    """ 
+
     old_password = forms.CharField(widget=forms.PasswordInput(
-        attrs={'placeholder': 'Old password'}
-    ), label='Old password')
+        attrs={'placeholder': 'Current password'}
+    ), label='Current password')
     
     new_password1 = forms.CharField(widget=forms.PasswordInput(
         attrs={'placeholder': 'New password'}
@@ -114,7 +152,7 @@ class UpdatePasswordForm(PasswordChangeForm):
 
     class Meta:
         model = get_user_model()
-        fields = ('old_password', 'new_password1', 'new_password2')
+        #fields = ('old_password', 'new_password1', 'new_password2')
 
     def __init__(self, *args, **kwargs):
         super(UpdatePasswordForm, self).__init__(*args, **kwargs)
@@ -127,10 +165,13 @@ class UpdatePasswordForm(PasswordChangeForm):
 
 
 class ResetPasswordRequestForm(PasswordResetForm):
+    """
+    Creates a password reset request form. 
+    """
     email = forms.EmailField(widget=forms.EmailInput(
         attrs = {'autocomplete': 'username', 'placeholder': 'Email address'}
     ), label='Email address')
-    
+
     class Meta:
         model = get_user_model()
         fields = ('email',)
@@ -146,6 +187,9 @@ class ResetPasswordRequestForm(PasswordResetForm):
 
 
 class ResetPasswordForm(SetPasswordForm):
+    """
+    Creates a password reset form. 
+    """
     new_password1 = forms.CharField(widget=forms.PasswordInput(
         attrs={'placeholder': 'Password'}
     ), label='Password')
@@ -169,6 +213,9 @@ class ResetPasswordForm(SetPasswordForm):
 
 
 class DeleteAccountForm(forms.ModelForm):
+    """
+    Creates a delete account form. 
+    """
     class Meta:
         model = get_user_model()
         fields = ()
