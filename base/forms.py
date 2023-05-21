@@ -44,7 +44,7 @@ class RegisterForm(UserCreationForm):
         self.helper.form_id = 'id_register_form'
         self.helper.form_class = 'form'
         self.helper.form_method = 'post'
-        self.helper.add_input(Submit('register_button', 'Submit'))
+        self.helper.add_input(ButtonSubmit('register_button', 'Submit'))
     
     def save(self, commit=True):
         user = super(RegisterForm, self).save(commit=False)
