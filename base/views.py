@@ -48,11 +48,6 @@ class RedirectLoggedInMixin(UserPassesTestMixin):
 
 
 
-
-
-
-
-
 ########################
 #      Base Views      #
 ########################
@@ -63,15 +58,7 @@ class UserLoggedOutView(RedirectLoggedInMixin, TemplateView):
     """
     template_name = None
 
-
 class UserLoggedInView(LoginRequiredMixin, TemplateView):
-    """
-    Renders a template for an authenticated user. Required users to be logged in.
-    """
-    template_name = None
-
-
-class MessageView(LoginRequiredMixin, TemplateView):
     """
     Renders a template for an authenticated user. Required users to be logged in.
     """
@@ -83,13 +70,11 @@ class BaseFormView(SuccessMessageMixin, FormView):
     """
     template_name = form_page
 
-
 class BaseUserFormView(BaseFormView):
     """
     Base user form view.
     """
     model = get_user_model()
-
 
 class BaseAuthView(RedirectLoggedInMixin, BaseUserFormView):
     """
@@ -97,15 +82,6 @@ class BaseAuthView(RedirectLoggedInMixin, BaseUserFormView):
     """
     redirect_url = 'index' 
      
-
-
-
-
-
-
-
-
-
 
 
 ###################
@@ -118,15 +94,11 @@ class Home(UserLoggedInView):
     """
     template_name = home_page
 
-
-
 class Profile(UserLoggedInView):
     """
     Renders the profile page.
     """
     template_name = profile_page
-
-
 
 class Settings(UserLoggedInView):
     """
@@ -136,17 +108,10 @@ class Settings(UserLoggedInView):
 
 
 
-
-
-
-
 ############################
 #      Authentication      #
 ############################
 
-# /register/
-# /login/
-# /logout/
 class Register(BaseAuthView, CreateView):
     """
     Renders the register page to create a new user. 
@@ -167,8 +132,6 @@ class Register(BaseAuthView, CreateView):
             )
             if user is not None:
                 login(request, user)
-
-
 
 class Login(BaseAuthView, LoginView):
     """
@@ -196,8 +159,6 @@ class Login(BaseAuthView, LoginView):
                 messages.error(request, 'Invalid login credentials!')
         return render(request, self.template_name, context={'title': 'Login', 'form': form,})
 
-
-
 class Logout(LogoutView):
     """
     Logs the current user out.
@@ -206,17 +167,10 @@ class Logout(LogoutView):
 
 
 
-
-
-
-
-
 ######################
 #      Settings      #
 ######################
 
-# /settings/update-email/<slug>/
-# /settings/update-password/
 class UpdateEmail(BaseUserFormView, UpdateView):
     """
     Renders the update email page so a user can update their email address.
@@ -226,8 +180,6 @@ class UpdateEmail(BaseUserFormView, UpdateView):
     success_url = reverse_lazy('settings')
     extra_context = {'title': 'Update your email address', 'prompt': 'Enter your new email address.'}
     success_message = 'You have successfully updated your email!'
-    
-
 
 class UpdatePassword(BaseUserFormView, PasswordChangeView):
     """
@@ -240,15 +192,10 @@ class UpdatePassword(BaseUserFormView, PasswordChangeView):
     
 
 
-
-
 ############################
 #      Reset Password      #
 ############################
 
-# /password-reset/
-# /password-reset/done/
-# /password-reset/<uidb64>/<token>/
 class ResetPasswordRequest(BaseUserFormView, PasswordResetView):
     """
     Renders the reset password request page to request a password reset link be sent to users email.
@@ -259,15 +206,11 @@ class ResetPasswordRequest(BaseUserFormView, PasswordResetView):
     extra_context = {'title': 'Password reset request'}
     success_message = 'You have submitted a password reset request! Please check your email for instructions.'
 
-
-
 class ResetPasswordRequestDone(PasswordResetDoneView):
     """
     Renders the confirmation page of successful password reset request.
     """
     template_name = messages_page
-
-
 
 class ResetPassword(PasswordResetConfirmView):
     """
@@ -282,17 +225,10 @@ class ResetPassword(PasswordResetConfirmView):
 
 
 
-
-
-
-
-
-
 ############################
 #      Delete account      #
 ############################
 
-# /settings/delete-account/<slug>/
 class DeleteAccount(BaseUserFormView, DeleteView):
     """
     Renders the delete account page so a user can delete their account.
