@@ -1,7 +1,5 @@
 {% extends 'base.html' %}
 
-{% load crispy_forms_tags %}
-
 {% block title %} | Settings {% endblock%}
 
 {% block content %}
@@ -10,6 +8,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md-12">
+                {% include 'partials/_alerts.html' %}
                 {% if user.is_authenticated %}
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item mb-5 p-0 pb-5 border-bottom border-secondary">
@@ -21,7 +20,7 @@
                         <li class="list-group-item mb-5 p-0 pb-5 border-bottom border-secondary">
                             <h2 class="mb-4">Change Password</h2>
                             <p>Click the button below to update your password. You will be required to provide your current password.</p>
-                            <a class="btn btn-dark"href="{% url 'update-password' %}">Update Password</a>
+                            <a class="btn btn-dark"href="{% url 'update-password' user.username %}">Update Password</a>
                         </li>
                         <li class="list-group-item mb-5 p-0 pb-5 border-bottom border-secondary">
                             <h2 class="mb-4">Reset Password</h2>

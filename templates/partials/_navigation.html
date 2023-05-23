@@ -5,7 +5,7 @@
 		    <div class="row">
 			    <div class="col-md-12">
                     <a href="
-                        {% with '/settings/'|add:user.username|add:'/' as user_settings and '/profile/'|add:user.username|add:'/' as user_profile' %}
+                        {% with '/settings/' as user_settings and '/profile/'|add:user.username|add:'/' as user_profile' %}
                             {% if request.path == user_settings or request.path == user_profile %}
                                 {% url 'index' %}
                             {% else %}

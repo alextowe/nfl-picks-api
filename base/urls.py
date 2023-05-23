@@ -7,15 +7,14 @@ urlpatterns = [
     path('login/', Login.as_view(), name='login'),
     path('logout/', Logout.as_view(), name='logout'),
     
-    path('profile/<slug>/', Profile.as_view(), name='profile'),
+    path('profile<slug>/', Profile.as_view(), name='profile'),
     
     path('settings/', Settings.as_view(), name='settings'),
-    path('settings/update-email/<slug>', UpdateEmail.as_view(), name='update-email'),
-    path('settings/update-password/', UpdatePassword.as_view(), name='update-password'),
+    path('settings/update-email/<slug>/', UpdateEmail.as_view(), name='update-email'),
+    path('settings/update-password/<slug>/', UpdatePassword.as_view(), name='update-password'),
+    path('settings/delete-account/<slug>/', DeleteAccount.as_view(), name='delete-account'),
 
     path('reset-password-request/', ResetPasswordRequest.as_view(), name='reset-password-request'),
     path('reset-password-request/done/', ResetPasswordRequestDone.as_view(), name='reset-password-request-done'),
     path('reset-password/<uidb64>/<token>/', ResetPassword.as_view(), name='reset-password'),
-    
-    path('settings/delete-account/<slug>', DeleteAccount.as_view(), name='delete-account'),
 ]

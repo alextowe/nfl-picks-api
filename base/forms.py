@@ -95,7 +95,7 @@ class LoginForm(AuthenticationForm):
     ), label='Password')
 
     class Meta:
-        #model = get_user_model()
+        model = get_user_model()
         fields = ('email', 'password')
 
     def __init__(self, *args, **kwargs):

@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import get_user_model, authenticate, login, logout
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.views import FormView, LoginView, LogoutView, PasswordChangeView, PasswordChangeDoneView, PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
@@ -11,25 +11,27 @@ from .models import User
 from .forms import RegisterForm, LoginForm, UpdateEmailForm, UpdatePasswordForm, ResetPasswordRequestForm, ResetPasswordForm, DeleteAccountForm
 from django.core.exceptions import ImproperlyConfigured
 
+
 home_page = 'base/index.html'
 profile_page = 'base/profile.html'
 settings_page = 'base/settings.html'
 form_page = 'base/single_form.html'
-messages_page = 'base/messages.html'
+messages_page = 'base/blank_page.html'
 
 
 
-class RedirectIfLoggedInMixin(UserPassesTestMixin):
+####################
+#      Mixins      #
+####################
+
+class RedirectLoggedInMixin(UserPassesTestMixin):
     """
-    Redirect to 'redirect_url' if 'test_func()' returns False.
+    Redirects to 'redirect_url' if user is authenticated.
     """
-
-    redirect_url = 'index'
     
+    redirect_url = None
+
     def get_redirect_url(self):
-        """
-        Override this method to override the redirect_url attribute.
-        """
         redirect_url = self.redirect_url
         if not redirect_url:
             raise ImproperlyConfigured(
@@ -45,56 +47,72 @@ class RedirectIfLoggedInMixin(UserPassesTestMixin):
         return not self.request.user.is_authenticated
 
 
-class LoggedOutMixin(RedirectIfLoggedInMixin, SuccessMessageMixin):
-    """
-    Mixin for views not requiring user authentication. 
-    """
 
 
 
-class LoggedInMixin(LoginRequiredMixin, SuccessMessageMixin):
-    """
-    Mixin for views requiring user authentication. 
-    """
 
 
 
-class UserLoggedOut(LoggedOutMixin, TemplateView):
+########################
+#      Base Views      #
+########################
+
+class UserLoggedOutView(RedirectLoggedInMixin, TemplateView):
     """
     Renders a templates for an unauthenticated user. Redirects logged in users.
     """
     template_name = None
 
 
-
-class UserLoggedIn(LoggedInMixin, TemplateView):
+class UserLoggedInView(LoginRequiredMixin, TemplateView):
     """
     Renders a template for an authenticated user. Required users to be logged in.
     """
     template_name = None
 
 
-
-class UserLoggedOutForm(LoggedOutMixin, FormView):
+class MessageView(LoginRequiredMixin, TemplateView):
     """
-    Base form for an unauthenticated user.
+    Renders a template for an authenticated user. Required users to be logged in.
     """
-    template_name  = form_page
-    redirect_url = 'index'
+    template_name = None
 
-
-
-class UserLoggedInForm(LoginRequiredMixin, SuccessMessageMixin ,FormView):
+class BaseFormView(SuccessMessageMixin, FormView):
     """
-    Base form for an authenticated user. 
+    Base form view.
     """
-    model = User
     template_name = form_page
-    success_url = reverse_lazy('settings')
+
+
+class BaseUserFormView(BaseFormView):
+    """
+    Base user form view.
+    """
+    model = get_user_model()
+
+
+class BaseAuthView(RedirectLoggedInMixin, BaseUserFormView):
+    """
+    Base view used for authentication (login and register).
+    """
+    redirect_url = 'index' 
+     
 
 
 
-class Home(UserLoggedIn):
+
+
+
+
+
+
+
+
+###################
+#      Pages      #
+###################
+
+class Home(UserLoggedInView):
     """
     Renders the home page.
     """
@@ -102,7 +120,7 @@ class Home(UserLoggedIn):
 
 
 
-class Profile(UserLoggedIn):
+class Profile(UserLoggedInView):
     """
     Renders the profile page.
     """
@@ -110,14 +128,26 @@ class Profile(UserLoggedIn):
 
 
 
-class Settings(UserLoggedIn):
+class Settings(UserLoggedInView):
     """
     Renders the settings page.
     """
     template_name = settings_page
 
 
-class Register(UserLoggedOutForm, CreateView):
+
+
+
+
+
+############################
+#      Authentication      #
+############################
+
+# /register/
+# /login/
+# /logout/
+class Register(BaseAuthView, CreateView):
     """
     Renders the register page to create a new user. 
     """
@@ -140,7 +170,7 @@ class Register(UserLoggedOutForm, CreateView):
 
 
 
-class Login(UserLoggedOutForm, LoginView):
+class Login(BaseAuthView, LoginView):
     """
     Renders the login page so a user can login. 
     """
@@ -176,48 +206,70 @@ class Logout(LogoutView):
 
 
 
-class UpdateEmail(UserLoggedInForm, UpdateView):
+
+
+
+
+
+######################
+#      Settings      #
+######################
+
+# /settings/update-email/<slug>/
+# /settings/update-password/
+class UpdateEmail(BaseUserFormView, UpdateView):
     """
     Renders the update email page so a user can update their email address.
     """
     form_class = UpdateEmailForm
     slug_field = 'username'
+    success_url = reverse_lazy('settings')
     extra_context = {'title': 'Update your email address', 'prompt': 'Enter your new email address.'}
     success_message = 'You have successfully updated your email!'
     
 
 
-class UpdatePassword(UserLoggedInForm, PasswordChangeView):
+class UpdatePassword(BaseUserFormView, PasswordChangeView):
     """
     Renders the update password page so a user can update their password.
     """
     form_class = UpdatePasswordForm
+    success_url = reverse_lazy('settings')
     extra_context = {'title': 'Update your password'}
     success_message = 'You have successfully changed your password!'
     
 
 
-class ResetPasswordRequest(UserLoggedInForm, PasswordResetView):
+
+
+############################
+#      Reset Password      #
+############################
+
+# /password-reset/
+# /password-reset/done/
+# /password-reset/<uidb64>/<token>/
+class ResetPasswordRequest(BaseUserFormView, PasswordResetView):
     """
     Renders the reset password request page to request a password reset link be sent to users email.
     """
-    model = User
     form_class = ResetPasswordRequestForm
     email_template_name = 'base/password_reset_email.html'
+    success_url = 'done'
     extra_context = {'title': 'Password reset request'}
     success_message = 'You have submitted a password reset request! Please check your email for instructions.'
-    
 
 
-class ResetPasswordRequestDone(TemplateView):
+
+class ResetPasswordRequestDone(PasswordResetDoneView):
     """
-    Renders the confirmation page for reset password request.
+    Renders the confirmation page of successful password reset request.
     """
-    template_name = messages_page 
+    template_name = messages_page
 
 
 
-class ResetPassword(UserLoggedOutForm, PasswordResetConfirmView):
+class ResetPassword(PasswordResetConfirmView):
     """
     Renders the reset password page so a user can create a new password. Redirects to login page. 
     """
@@ -230,7 +282,18 @@ class ResetPassword(UserLoggedOutForm, PasswordResetConfirmView):
 
 
 
-class DeleteAccount(UserLoggedInForm, DeleteView):
+
+
+
+
+
+
+############################
+#      Delete account      #
+############################
+
+# /settings/delete-account/<slug>/
+class DeleteAccount(BaseUserFormView, DeleteView):
     """
     Renders the delete account page so a user can delete their account.
     """
