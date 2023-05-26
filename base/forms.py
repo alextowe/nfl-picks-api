@@ -6,9 +6,6 @@ from.models import User
 
 
 
-
-
-
 class RegisterForm(UserCreationForm):
     """
     Creates a user creation form. 
