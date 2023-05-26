@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}  {% endblock %}
+		
+{% block content %}
+    <!-- Form Section -->	
+    <section id="form-section" class="py-5">
+	    <div class="container">
+		    <div class="row">
+			    <div class="col-lg-4 offset-lg-4">
+                    {% include 'partials/_alerts.html' %}
+                    <h2 class="mb-4">Form Title</h2>
+                    {% for field in form %}
+                        {{ field }}
+                    {% endfor %}
+                </div>
+		    </div>	
+    	</div>
+    </section>
+{% endblock %}
