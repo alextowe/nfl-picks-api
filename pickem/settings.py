@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import environ, os
 from django.contrib.messages import constants as messages
+from django.forms.renderers import TemplatesSetting
 
 # set default debug value to false
 env = environ.Env(DEBUG=(bool, False))
@@ -118,6 +119,8 @@ USE_I18N = True
 USE_TZ = True
 
 AUTH_USER_MODEL = 'base.User'
+
+AUTHENTICATION_BACKENDS = ["django.contrib.auth.backends.AllowAllUsersModelBackend"]
 
 LOGIN_URL = 'login'
 

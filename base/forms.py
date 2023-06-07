@@ -1,10 +1,24 @@
+# Import tools
 from django import forms
+from django.forms import (
+    CharField,
+    EmailField,
+)
 from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm, PasswordResetForm, SetPasswordForm
-from.models import User
+from django.utils.translation import gettext_lazy as _
+from django.core.validators import EmailValidator
+
+# Import default forms 
+from django.contrib.auth.forms import (
+    UserCreationForm, 
+    AuthenticationForm, 
+    PasswordChangeForm, 
+    PasswordResetForm, 
+    SetPasswordForm,
+)
 
 
-
+# User authentication forms
 
 class RegisterForm(UserCreationForm):
     """
@@ -16,7 +30,11 @@ class RegisterForm(UserCreationForm):
                 'placeholder': 'Username',
             }
         ), 
-        label='Username'
+        label='Username',
+        error_messages = {
+            'required': _('Username is required!'),
+            'invalid': _('Invalid Username'),
+        }
     )
     
     email = forms.EmailField(widget=forms.EmailInput(
@@ -28,9 +46,10 @@ class RegisterForm(UserCreationForm):
         label='Email address'
     )
 
-    password1 = forms.CharField(widget=forms.PasswordInput(
-        attrs={
-            'placeholder': 'Password',
+    password1 = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                'placeholder': 'Password',
             }
         ), 
         label='Password'
@@ -51,18 +70,13 @@ class RegisterForm(UserCreationForm):
         model = get_user_model()        
         fields = ('username', 'email', 'password1', 'password2')
 
-    def __init__(self, *args, **kwargs):
-        super(RegisterForm, self).__init__(*args, **kwargs)
-    
     def save(self, commit=True):
         user = super(RegisterForm, self).save(commit=False)
         user.email = self.cleaned_data['email']
         if commit:
             user.save()
         return user
-
-
-
+    
 class LoginForm(AuthenticationForm):
     """
     Creates a user login form. 
@@ -97,6 +111,7 @@ class LoginForm(AuthenticationForm):
         self.fields.pop('username')
 
 
+# User settings forms
 
 class UpdateEmailForm(forms.ModelForm):
     """
@@ -105,11 +120,12 @@ class UpdateEmailForm(forms.ModelForm):
     email = forms.EmailField(
         widget=forms.EmailInput(
             attrs = {
-            'autocomplete': 'username', 
+            #'autocomplete': 'username', 
             'placeholder': 'Email address',
             }
         ), 
-        label='Email address'
+        label='Email address',
+        validators=[EmailValidator(message='Invalid Email')],
     )
     
     field_order = ('email',)
@@ -121,8 +137,6 @@ class UpdateEmailForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(UpdateEmailForm, self).__init__(*args, **kwargs)
 
-
-
 class UpdatePasswordForm(PasswordChangeForm):
     """
     Creates an update password form. 
@@ -131,6 +145,7 @@ class UpdatePasswordForm(PasswordChangeForm):
     old_password = forms.CharField(
         widget=forms.PasswordInput(
             attrs={
+                'autocomplete': 'password',
                 'placeholder': 'Current password'
             }
         ), 
@@ -162,8 +177,6 @@ class UpdatePasswordForm(PasswordChangeForm):
     def __init__(self, *args, **kwargs):
         super(UpdatePasswordForm, self).__init__(*args, **kwargs)
 
-
-
 class ResetPasswordRequestForm(PasswordResetForm):
     """
     Creates a password reset request form. 
@@ -178,8 +191,6 @@ class ResetPasswordRequestForm(PasswordResetForm):
 
     def __init__(self, *args, **kwargs):
         super(ResetPasswordRequestForm, self).__init__(*args, **kwargs)
-
-
 
 class ResetPasswordForm(SetPasswordForm):
     """
@@ -210,8 +221,6 @@ class ResetPasswordForm(SetPasswordForm):
     def __init__(self, *args, **kwargs):
         super(ResetPasswordForm, self).__init__(*args, **kwargs)
 
-
-
 class DeleteAccountForm(forms.ModelForm):
     """
     Creates a delete account form. 
@@ -223,4 +232,3 @@ class DeleteAccountForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(DeleteAccountForm, self).__init__(*args, **kwargs)
         
-

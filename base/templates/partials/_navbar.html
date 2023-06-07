@@ -1,38 +1,36 @@
 <!-- NavBar -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <div class="container-fluid">
-      <a class="navbar-brand" href="{% url 'index' %}">Logo</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDarkDropdown" aria-controls="navbarNavDarkDropdown" aria-expanded="false" aria-label="Toggle navigation">
+    <a class="navbar-brand" href="{% url 'index' %}">Logo</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDarkDropdown"
+      aria-controls="navbarNavDarkDropdown" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     {% if user.is_authenticated %}
     <div class="collapse navbar-collapse justify-content-end" id="navbarNavDarkDropdown">
       <ul class="navbar-nav">
         <li class="nav-item dropstart">
-          <a 
-              class="nav-link dropdown-toggle" 
-              href="#" 
-              role="button" 
-              data-bs-toggle="dropdown" 
-              aria-expanded="false">
-                {{ user.username }}
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            {{ user.username }}
           </a>
           <ul class="dropdown-menu dropdown-menu-dark">
-              <li><a class="dropdown-item" href="{% url 'index' %}">
-                    <i class="fa-solid fa-house me-3"></i>Home</a></li>
-              <li><a class="dropdown-item" href="{% url 'profile' user.username %}">
-                    <i class="fa-solid fa-user me-3"></i>My Profile</a></li>
-              <li><a class="dropdown-item" href="{% url 'settings' %}">
-                    <i class="fa-solid fa-gear me-3"></i>Settings</a></li>
-            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{% url 'index' %}">
+                <i class="fa-solid fa-house me-3"></i>Home</a></li>
+            <li><a class="dropdown-item" href="{% url 'profile' user.username %}">
+                <i class="fa-solid fa-user me-3"></i>My Profile</a></li>
+            <li><a class="dropdown-item" href="{% url 'settings' user.username %}">
+                <i class="fa-solid fa-gear me-3"></i>Settings</a></li>
             <li>
-                <a class="dropdown-item" href="javascript:{document.getElementById('logout').submit()}">
-                     <i class="fa-solid fa-right-from-bracket me-3"></i>Logout
-                </a>
-                <form action="{% url 'logout' %}" method="POST" id="logout">
-                    {% csrf_token %}
-                    <input type="hidden">
-                </form>
+              <hr class="dropdown-divider">
+            </li>
+            <li>
+              <a class="dropdown-item" href="javascript:{document.getElementById('logout').submit()}">
+                <i class="fa-solid fa-right-from-bracket me-3"></i>Logout
+              </a>
+              <form action="{% url 'logout' %}" method="POST" id="logout">
+                {% csrf_token %}
+                <input type="hidden">
+              </form>
             </li>
           </ul>
         </li>
