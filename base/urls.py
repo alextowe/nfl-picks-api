@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import (
+    Index,
     Home, 
     Register, 
     Activate,
@@ -16,7 +17,8 @@ from .views import (
 )
 
 urlpatterns = [
-    path('', Home.as_view(), name='index'),
+    path('', Index.as_view(), name='index'),
+    path('home/', Home.as_view(), name='home'),
     path('register/', Register.as_view(), name='register'),
     path('activate/<uidb64>/<token>/', Activate.as_view(), name='activate'),
     path('login/', Login.as_view(), name='login'),

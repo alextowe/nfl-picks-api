@@ -7,7 +7,6 @@ from django.contrib.auth import (
     logout
 )
 
-
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -21,14 +20,12 @@ from django.urls import (
 from django.core.exceptions import ImproperlyConfigured
 from django.contrib.auth.backends import ModelBackend
 
-
 # Import mixins
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.mixins import (
     UserPassesTestMixin, 
     LoginRequiredMixin
 )
-
 
 # Import default views
 from django.contrib.auth.views import ( 
@@ -70,19 +67,19 @@ from .forms import (
     DeleteAccountForm
 )
 
-# import tokens
+# Import tokens
 from .tokens import email_token_generator
 
-
 # Set page template variables
-home_page = 'base/index.html'
-profile_page = 'base/profile.html'
-settings_page = 'base/settings.html'
-form_page = 'base/single_form.html'
+base_page = 'base/pages/index.html'
+home_page = 'base/pages/home.html'
+profile_page = 'base/pages/profile.html'
+settings_page = 'base/pages/settings.html'
+form_page = 'base/pages/form_page.html'
+email_verification = 'base/emails/email_verification.html'
 
-# set user model
+# Set user model
 User = get_user_model()
-
 
 # Custom mixins
 class RedirectLoggedInMixin(UserPassesTestMixin):
@@ -108,21 +105,18 @@ class RedirectLoggedInMixin(UserPassesTestMixin):
 
 class EmailVerificationMixin(FormMixin):
     """
+    Sends a veriication email to an inactive user on valid form submit.
     """
-    subject = None
-    email_template_name = None
+    subject = 'Verify your email address'
+    email_template_name = email_verification
     success_url = None
     success_message = None 
     token_generator = email_token_generator
 
-    def form_valid(self, form):
+    def send_verification_email(self, user):
         """
-        Saves the new user form.
+        Sends a verification email to a given user.
         """
-        user = form.save(commit=False)
-        user.is_active = False
-        user.save()
-
         current_site = get_current_site(self.request)
         subject = self.subject
         message = render_to_string(self.email_template_name, {
@@ -134,9 +128,18 @@ class EmailVerificationMixin(FormMixin):
         })
         user.email_user(subject, message)
 
-        messages.success(self.request, self.success_message)
-        return redirect(self.success_url) 
+    def form_valid(self, form):
+        """
+        Sets user to inactive and calls 'send_verification_email'.
+        """
+        user = form.save(commit=False)
+        user.is_active = False
+        user.save()
 
+        self.send_verification_email(user)
+
+        messages.success(self.request, self.success_message)
+        return redirect(self.success_url)
 
 # Base views
 class UserLoggedOutView(RedirectLoggedInMixin, TemplateView):
@@ -167,13 +170,13 @@ class BaseAuthView(RedirectLoggedInMixin, BaseUserFormView):
     """
     Base view used for authentication (login and register).
     """
-    redirect_url = 'index' 
+    redirect_url = 'home' 
 
 class EmailRedirectView(RedirectView):
     """
     Redirects from a email verification link 
     """
-    success_message = None
+    success_message = 'Your email address has been verified!'
     warning_message = 'The verification link was invalid, possibly because it has already been used.'
     token_generator = email_token_generator
 
@@ -194,8 +197,14 @@ class EmailRedirectView(RedirectView):
         
         return redirect(self.url)
 
-
 # Basic pages
+class Index(UserLoggedOutView):
+    """
+    Renders the home page.
+    """
+    redirect_url = 'home'
+    template_name = base_page
+
 class Home(UserLoggedInView):
     """
     Renders the home page.
@@ -214,27 +223,17 @@ class Settings(UserLoggedInView):
     """
     template_name = settings_page
 
-
-
-
-
-
-
-
 # User authentication views
-
 class Register(EmailVerificationMixin, BaseAuthView, CreateView):
     """
     Renders the register page to create a new user. 
     """
     form_class = RegisterForm
-    subject = 'Verify your account'
-    email_template_name = 'base/emails/account_activation_email.html'
-    success_url = 'login'
-    success_message = 'You have successfully created your account. Please check your email for a verification link.'
     extra_context = {
         'title': 'Register your account',
     }
+    success_url = 'login'
+    success_message = 'You have successfully created your account! Please check your email for a verification link.'
 
 
 class Activate(EmailRedirectView):
@@ -242,12 +241,8 @@ class Activate(EmailRedirectView):
     Activates a user account. Redirects to login.
     """
     url = 'login'
-    success_message = 'Your account has been activated!'
     
-
-    
-
-class Login(BaseAuthView, LoginView):
+class Login(EmailVerificationMixin, BaseAuthView, LoginView):
     """
     Renders the login page. 
     """
@@ -258,25 +253,23 @@ class Login(BaseAuthView, LoginView):
         'title': 'Login',
     }
 
-    def post(self, request):
+    def form_valid(self, form):
         """
         Logs a user in on a POST request. Inactive users cannot login.
         """
-        form = self.get_form()
-        if form.is_valid():
-            user = authenticate(
-                email=form.cleaned_data['email'],
-                password=form.cleaned_data['password'],
-            )
-            if user is not None:
-                if user.is_active:
-                    login(request, user) 
-                    return redirect('index')
-                else:
-                    # resend confirmation email
-                    messages.error(request, 'Your account is not verified! A new verification email has been sent to your email addrtess.') 
+        user = authenticate(
+            email=form.cleaned_data['email'],
+            password=form.cleaned_data['password'],
+        )
+        if user is not None:
+            if user.is_active:
+                login(self.request, user) 
+                return redirect(self.next_page)
             else:
-                messages.error(request, 'Incorrect email or password!')  
+                self.send_verification_email(user)
+                messages.error(self.request, 'Your account has not been verified! Please check your email for a new verification link.') 
+        else:
+            messages.error(self.request, 'Incorrect email or password!')  
         return redirect('login')
 
 class Logout(LogoutView):
@@ -285,29 +278,23 @@ class Logout(LogoutView):
     """
     next_page = 'login'
 
-
 class UpdateEmail(EmailVerificationMixin, BaseUserFormView, UpdateView):
     """
     Renders the update email page.
     """
     form_class = UpdateEmailForm
-    subject = 'Verify your email address'
     slug_field = 'username' 
-    email_template_name = 'base/emails/new_address_confirmation_email.html'
     extra_context = {
         'title': 'Update your email address',
     }
     success_url = reverse_lazy('settings')
-    success_message = 'You have successfully updated your email! Please check your email for a verification link.'
-
+    success_message = 'Your email has been updated! Please check your email for a verification link.'
 
 class VerifyEmail(EmailRedirectView):
     """
     Activates a user account. Redirects to login.
     """
     url = 'login'
-    success_message = 'Your email address has been updated!'
-
 
 class UpdatePassword(BaseUserFormView, PasswordChangeView):
     """
@@ -321,7 +308,6 @@ class UpdatePassword(BaseUserFormView, PasswordChangeView):
     success_url = reverse_lazy('settings')
     success_message = 'You have successfully changed your password!'
 
-
 class ResetPasswordRequest(BaseUserFormView, PasswordResetView):
     """
     Renders the reset password request page to request a password reset link be sent to users email. Redirects back to settings.
@@ -331,7 +317,6 @@ class ResetPasswordRequest(BaseUserFormView, PasswordResetView):
     title = 'Password reset request'
     success_url = reverse_lazy('settings')
     success_message = 'You have submitted a password reset request! Please check your email for instructions.'
-
 
 class ResetPassword(BaseUserFormView, PasswordResetConfirmView):
     """

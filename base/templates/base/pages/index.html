@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %} {% endblock%}
+
+{% block content %}
+<!-- Section -->
+<section id="" class="my-3 my-lg-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+                {% include 'partials/_alerts.html' %}
+                <h2 class="mb-4">Pickem Challenge!</h2>
+                <p>Click one of the buttons below to login or create an account.</p>
+                <a class="btn btn-dark"href="{% url 'login' %}">Login</a>
+                <a class="btn btn-dark"href="{% url 'register' %}">Signup</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+

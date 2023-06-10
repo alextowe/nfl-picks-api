@@ -1,19 +1,16 @@
 {% extends 'base.html' %}
 
-{% block title %} | Settings {% endblock%}
+{% block title %} | My Profile {% endblock%}
 
 {% block content %}
-<!-- Base Page -->
-<section id="settings" class="my-5">
+<!-- {{ user.username }}'s Profile -->
+<section id="home" class="my-3 my-lg-5">
     <div class="container">
         <div class="row">
             <div class="col-lg-8 offset-lg-2">
                 {% include 'partials/_alerts.html' %}
-                {% if user.is_authenticated %}
-                    
-                {% else %}
-                    <p>You are not logged in.</p>
-                {% endif %}
+                This is your profile, {{ user.username }}.
+            
             </div>
         </div>
     </div>

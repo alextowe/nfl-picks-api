@@ -6,7 +6,7 @@
 
 {% block content %}
 <!-- Form Section -->
-<section id="form-section" class="py-5">
+<section id="form-section" class="my-3 my-lg-5">
     <div class="container">
         <div class="row">
             <div class="col-lg-6 offset-lg-3">
@@ -16,8 +16,8 @@
                 <form method="post">
                     {% csrf_token %}
                     {% for field in form %}
-                    {{ field|add_class:"form-control mb-4" }}
-                    {{ field.errors }}
+                        {{ field|add_class:"form-control mb-4" }}
+                        {{ field.errors }}
                     {% endfor %}
                     <button type="submit" class="btn btn-dark">Submit</button>
                 </form>
@@ -25,4 +25,4 @@
         </div>
     </div>
 </section>
-{% endblock %}
+{% endblock %} 

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %} | Home {% endblock%}
+
+{% block content %}
+<!-- Home  -->
+<section id="home" class="my-3 my-lg-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+                {% include 'partials/_alerts.html' %}
+                Welcome, {{ user.username }}!
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %} 
