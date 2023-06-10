@@ -3,14 +3,14 @@
 {% block title %} | Settings {% endblock%}
 
 {% block content %}
-<!-- Home  -->
-<section id="home" class="my-5">
+<!-- Base Page -->
+<section id="settings" class="my-5">
     <div class="container">
         <div class="row">
             <div class="col-lg-8 offset-lg-2">
                 {% include 'partials/_alerts.html' %}
                 {% if user.is_authenticated %}
-                    Welcome {{ user.username }}
+                    
                 {% else %}
                     <p>You are not logged in.</p>
                 {% endif %}
@@ -19,3 +19,4 @@
     </div>
 </section>
 {% endblock %}
+

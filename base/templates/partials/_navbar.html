@@ -1,11 +1,7 @@
 <!-- NavBar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand navbar-dark bg-dark">
   <div class="container-fluid">
     <a class="navbar-brand" href="{% url 'index' %}">Logo</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDarkDropdown"
-      aria-controls="navbarNavDarkDropdown" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
     {% if user.is_authenticated %}
     <div class="collapse navbar-collapse justify-content-end" id="navbarNavDarkDropdown">
       <ul class="navbar-nav">
@@ -18,7 +14,7 @@
                 <i class="fa-solid fa-house me-3"></i>Home</a></li>
             <li><a class="dropdown-item" href="{% url 'profile' user.username %}">
                 <i class="fa-solid fa-user me-3"></i>My Profile</a></li>
-            <li><a class="dropdown-item" href="{% url 'settings' user.username %}">
+            <li><a class="dropdown-item" href="{% url 'settings' %}">
                 <i class="fa-solid fa-gear me-3"></i>Settings</a></li>
             <li>
               <hr class="dropdown-divider">
