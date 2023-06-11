@@ -5,8 +5,8 @@
 {% block title %} {% endblock %}
 
 {% block content %}
-<!-- Form Section -->
-<section id="form-section" class="my-3 my-lg-5">
+<!-- Form -->
+<section id="form" class="my-3 my-lg-5">
     <div class="container">
         <div class="row">
             <div class="col-lg-6 offset-lg-3">
@@ -19,7 +19,12 @@
                         {{ field|add_class:"form-control mb-4" }}
                         {{ field.errors }}
                     {% endfor %}
-                    <button type="submit" class="btn btn-dark">Submit</button>
+                    <button type="submit" class=" btn
+                        {% if danger %}
+                            btn-danger
+                        {% else %} 
+                            btn-dark
+                        {% endif %}">Submit</button>
                 </form>
             </div>
         </div>

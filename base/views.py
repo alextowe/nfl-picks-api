@@ -52,7 +52,7 @@ from django.views.generic.edit import (
     DeleteView
 )
 
-from django.views.generic import RedirectView 
+from django.views.generic import RedirectView, ListView
 
 from django.views.generic.detail import SingleObjectMixin
 
@@ -223,6 +223,7 @@ class Settings(UserLoggedInView):
     """
     template_name = settings_page
 
+
 # User authentication views
 class Register(EmailVerificationMixin, BaseAuthView, CreateView):
     """
@@ -339,7 +340,8 @@ class DeleteAccount(BaseUserFormView, DeleteView):
     form_class = DeleteAccountForm
     slug_field = 'username' 
     extra_context = {
-        'title': 'Delete your account'
+        'title': 'Delete your account',
+        'danger': True
     }
     success_url = reverse_lazy('login')
     success_message = 'You have successfully deleted your account!' 

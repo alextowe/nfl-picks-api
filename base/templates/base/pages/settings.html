@@ -3,52 +3,46 @@
 {% block title %} | Settings {% endblock%}
 
 {% block content %}
-<!-- Settings Section -->
+<!-- Settings -->
 <section id="settings" class="my-3 my-lg-5">
     <div class="container">
         <div class="row">
             <div class="col-lg-8 offset-lg-2">
                 {% include 'partials/_alerts.html' %}
-                {% if user.is_authenticated %}
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item mb-5 p-0 pb-5 border-bottom border-secondary">
-                            <h2 class="mb-4">Update Email Address</h2>
-                            <p>Click the button below to update your email address.</p>
-                            <p>Current Email: {{ user.email }}</p>
-                            {% if user.is_active %} 
-                                <p class="text-success">
-                                    <i class="fa-solid fa-circle-check"></i>
-                                    Email confirmed
-                                </p>
-                            {% else %}
-                                <p class="text-danger">
-                                    <i class="fa-solid fa-circle-exclamation"></i>
-                                    Email not confirmed
-                                </p>
-                                <a class="btn btn-danger mb-2" href="">Resend Verification Email</a>
-                                <br>
-                            {% endif %}
-                            <a class="btn btn-dark"href="{% url 'update-email' user.username %}">Update Email</a>
-                        </li>
-                        <li class="list-group-item mb-5 p-0 pb-5 border-bottom border-secondary">
-                            <h2 class="mb-4">Change Password</h2>
-                            <p>Click the button below to update your password. You will be required to provide your current password.</p>
-                            <a class="btn btn-dark"href="{% url 'update-password' %}">Update Password</a>
-                        </li>
-                        <li class="list-group-item mb-5 p-0 pb-5 border-bottom border-secondary">
-                            <h2 class="mb-4">Reset Password</h2>
-                            <p>Click the button below to reset your password. Use this if you forgot your current password.</p>
-                            <a class="btn btn-dark"href="{% url 'reset-password-request' %}">Reset Password</a>
-                        </li>
-                        <li class="list-group-item mb-5 p-0 pb-5 border-bottom border-secondary">
-                            <h2 class="mb-4">Delete Account</h2>
-                            <p>Click the button below to delete your account.</p>
-                            <a class="btn btn-outline-danger"href="{% url 'delete-account' user.username %}">Delete Account</a>
-                        </li>
-                    </ul>
-                {% else %}
-                    <p>You are not logged in.</p>
-                {% endif %}
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item mb-5 p-0 pb-5 border-bottom border-secondary">
+                        <h2 class="mb-4">Update Email Address</h2>
+                        <p>Click the button below to update your email address.</p>
+                        <p>Current Email: {{ user.email }}</p>
+                        {% if user.is_active %} 
+                            <p class="text-success">
+                                <i class="fa-solid fa-circle-check"></i>
+                                Email confirmed
+                            </p>
+                        {% else %}
+                            <p class="text-danger">
+                                <i class="fa-solid fa-circle-exclamation"></i>
+                                Email not confirmed
+                            </p>
+                        {% endif %}
+                        <a class="btn btn-dark"href="{% url 'update-email' user.username %}">Update Email</a>
+                    </li>
+                    <li class="list-group-item mb-5 p-0 pb-5 border-bottom border-secondary">
+                        <h2 class="mb-4">Change Password</h2>
+                        <p>Click the button below to update your password. You will be required to provide your current password.</p>
+                        <a class="btn btn-dark"href="{% url 'update-password' %}">Update Password</a>
+                    </li>
+                    <li class="list-group-item mb-5 p-0 pb-5 border-bottom border-secondary">
+                        <h2 class="mb-4">Reset Password</h2>
+                        <p>Click the button below to reset your password. Use this if you forgot your current password.</p>
+                        <a class="btn btn-dark"href="{% url 'reset-password-request' %}">Reset Password</a>
+                    </li>
+                    <li class="list-group-item mb-5 p-0 pb-5 border-bottom border-secondary">
+                        <h2 class="mb-4">Delete Account</h2>
+                        <p>Click the button below to delete your account.</p>
+                        <a class="btn btn-outline-danger"href="{% url 'delete-account' user.username %}">Delete Account</a>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
