@@ -17,12 +17,15 @@
                         {% if user.is_active %} 
                             <p class="text-success">
                                 <i class="fa-solid fa-circle-check"></i>
-                                Email confirmed
+                                Email address verified
                             </p>
                         {% else %}
-                            <p class="text-danger">
+                            <p class="text-danger mb-1">
                                 <i class="fa-solid fa-circle-exclamation"></i>
-                                Email not confirmed
+                                Email address not verified
+                            </p>
+                            <p class="">
+                                Check your email for a verifiction link.
                             </p>
                         {% endif %}
                         <a class="btn btn-dark"href="{% url 'update-email' user.username %}">Update Email</a>
