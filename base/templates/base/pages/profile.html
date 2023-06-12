@@ -11,16 +11,18 @@
         <div class="row">
             <div class="col-lg-8 offset-lg-2">
                 {% include 'partials/_alerts.html' %}
-                <img src="{% static 'images/profile/default.png' %}" alt="profile-picture" class="d-inline-block">
-                <div class="d-inline-block">
-                    <h1 class="h1 mb-3 ">
-                        {% if user.profile.display_name %}
-                            {{ user.profile.display_name }}
-                        {% else %}
-                            {{ user.username }}
-                        {% endif %}
-                    </h1>
-                    <p class="lead pb-3 mb-4 border border-top-0 border-start-0 border-end-0 border-bottom-1 border-dark">{{ user.profile.biography }}</p>   
+                <div class="d-flex align-items-center p-3 border border-top-0 border-start-0 border-end-0 border-bottom-1 border-dark">
+                    <img src="{% static 'images/profile/default.png' %}" alt="profile-picture" style="width:250px; height:250px;" class="bg-dark rounded-circle">
+                    <div class="ms-4">
+                        <h1 class="h1 mb-3">
+                            {% if user.profile.display_name %}
+                                {{ user.profile.display_name }}
+                            {% else %}
+                                {{ user.username }}
+                            {% endif %}
+                        </h1>
+                        <p class="lead pb-3 mb-4 ">{{ user.profile.biography }}</p>   
+                    </div>
                 </div>
             </div>
         </div>
