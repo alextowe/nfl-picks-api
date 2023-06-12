@@ -70,6 +70,9 @@ from .forms import (
     DeleteAccountForm
 )
 
+# Import models 
+from .models import Profile
+
 # Import tokens
 from .tokens import email_token_generator
 
@@ -223,6 +226,7 @@ class Profile(UserLoggedInView):
     Renders the profile page.
     """
     template_name = profile_page
+    
 
 class Settings(UserLoggedInView):
     """
@@ -285,6 +289,10 @@ class Logout(LogoutView):
     Logs the current user out.
     """
     next_page = 'login'
+
+class UpdateProfileView():
+    """
+    """
 
 class UpdateEmail(EmailVerificationMixin, BaseUserFormView, UpdateView):
     """
