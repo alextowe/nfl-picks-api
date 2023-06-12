@@ -6,5 +6,4 @@ class EmailVerificationTokenGenerator(PasswordResetTokenGenerator):
                 str(user.is_active) + str(user.pk) + str(timestamp)
         )
 
-
 email_token_generator = EmailVerificationTokenGenerator()

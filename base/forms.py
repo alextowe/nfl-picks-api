@@ -17,9 +17,7 @@ from django.contrib.auth.forms import (
     SetPasswordForm,
 )
 
-
 # User authentication forms
-
 class RegisterForm(UserCreationForm):
     """
     Creates a user creation form. 
@@ -110,9 +108,7 @@ class LoginForm(AuthenticationForm):
         super(LoginForm, self).__init__(*args, **kwargs)
         self.fields.pop('username')
 
-
 # User settings forms
-
 class UpdateEmailForm(forms.ModelForm):
     """
     Creates an update email form. 
@@ -231,4 +227,3 @@ class DeleteAccountForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(DeleteAccountForm, self).__init__(*args, **kwargs)
-        

@@ -11,6 +11,9 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
+from django.utils.translation import gettext_lazy as _
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_protect
 from django.contrib import messages
 from django.urls import (
     reverse_lazy, 
@@ -76,7 +79,10 @@ home_page = 'base/pages/home.html'
 profile_page = 'base/pages/profile.html'
 settings_page = 'base/pages/settings.html'
 form_page = 'base/pages/form_page.html'
-email_verification = 'base/emails/email_verification.html'
+account_verification_email = 'base/emails/email_verification.html'
+account_verification_subject = 'base/emails/email_verification_subject.txt'
+reset_password_email = 'base/emails/reset_password.html'
+reset_password_subject = 'base/emails/reset_password_subject.txt'
 
 # Set user model
 User = get_user_model()
@@ -107,8 +113,8 @@ class EmailVerificationMixin(FormMixin):
     """
     Sends a veriication email to an inactive user on valid form submit.
     """
+    email_template_name = account_verification_email
     subject = 'Verify your email address'
-    email_template_name = email_verification
     success_url = None
     success_message = None 
     token_generator = email_token_generator
@@ -139,7 +145,8 @@ class EmailVerificationMixin(FormMixin):
         self.send_verification_email(user)
 
         messages.success(self.request, self.success_message)
-        return redirect(self.success_url)
+        return redirect(self.success_url)   
+
 
 # Base views
 class UserLoggedOutView(RedirectLoggedInMixin, TemplateView):
@@ -314,7 +321,8 @@ class ResetPasswordRequest(BaseUserFormView, PasswordResetView):
     Renders the reset password request page to request a password reset link be sent to users email. Redirects back to settings.
     """
     form_class = ResetPasswordRequestForm
-    email_template_name = 'base/emails/password_reset_email.html'
+    email_template_name = reset_password_email
+    subject_template_name = reset_password_subject
     title = 'Password reset request'
     success_url = reverse_lazy('settings')
     success_message = 'You have submitted a password reset request! Please check your email for instructions.'
@@ -331,7 +339,7 @@ class ResetPassword(BaseUserFormView, PasswordResetConfirmView):
         'title': 'Enter your new password'
     }
     success_url = reverse_lazy('index')
-    success_message = 'You have successfully reset your password! You can now login to your account.'
+    success_message = 'You have reset your password!'
 
 class DeleteAccount(BaseUserFormView, DeleteView):
     """

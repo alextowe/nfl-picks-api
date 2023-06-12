@@ -10,8 +10,14 @@ class User(AbstractUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
-
     objects = UserManager()
 
     def __str__(self):
         return self.username
+
+class Profile(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    biography = models.TextField(blank=True)
+    profile_image = models.ImageField(upload_to='photos/profile/')
+    def __str__(self):
+        return self.user
