@@ -28,7 +28,7 @@ urlpatterns = [
     
     path('settings/', Settings.as_view(), name='settings'),
     path('settings/update-email/<slug>/', UpdateEmail.as_view(), name='update-email'),
-     path('settings/verify-new-email/<uidb64>/<token>/', VerifyEmail.as_view(), name='verify-new-email'),
+    path('settings/verify-new-email/<uidb64>/<token>/', VerifyEmail.as_view(), name='verify-new-email'),
     path('settings/update-password/', UpdatePassword.as_view(), name='update-password'),
     path('settings/delete-account/<slug>/', DeleteAccount.as_view(), name='delete-account'),
 
