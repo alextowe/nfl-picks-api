@@ -20,6 +20,8 @@
                         {% if profile.display_name == user.username %}
                             <a class="btn btn-dark"href="{% url 'edit-profile' user.username %}">Edit profile</a>
                         {% endif %}
+
+                        {{ profile.user.friends }}
                     {% endfor %}                  
                 </div>
             </div>

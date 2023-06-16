@@ -72,21 +72,22 @@ from .forms import (
 )
 
 # Import models 
-from .models import Profile
+from .models import Profile, FriendRequest
 
 # Import tokens
 from .tokens import email_token_generator
 
-# Set page template variables
-base_page = 'base/pages/index.html'
-home_page = 'base/pages/home.html'
-profile_page = 'base/pages/profile.html'
-settings_page = 'base/pages/settings.html'
-form_page = 'base/pages/form_page.html'
-account_verification_email = 'base/emails/email_verification.html'
-account_verification_subject = 'base/emails/email_verification_subject.txt'
-reset_password_email = 'base/emails/reset_password.html'
-reset_password_subject = 'base/emails/reset_password_subject.txt'
+# Set page templates
+BASE_PAGE = 'base/pages/index.html'
+HOME_PAGE = 'base/pages/home.html'
+PROFILE_PAGE = 'base/pages/profile.html'
+FRIENDS_LIST_PAGE = 'base/pages/friends.html'
+SETTINGS_PAGE = 'base/pages/settings.html'
+FORM_PAGE = 'base/pages/form_page.html'
+ACCOUNT_VERIFICATION_EMAIL = 'base/emails/email_verification.html'
+ACCOUNT_VERIFICATION_SUBJECT = 'base/emails/email_verification_subject.txt'
+RESET_PASSWORD_EMAIL = 'base/emails/reset_password.html'
+RESET_PASSWORD_SUBJECT = 'base/emails/reset_password_subject.txt'
 
 # Set user model
 User = get_user_model()
@@ -117,7 +118,7 @@ class EmailVerificationMixin(FormMixin):
     """
     Sends a veriication email to an inactive user on valid form submit.
     """
-    email_template_name = account_verification_email
+    email_template_name = ACCOUNT_VERIFICATION_EMAIL
     subject = 'Verify your email address'
     success_url = None
     success_message = None 
@@ -153,23 +154,12 @@ class EmailVerificationMixin(FormMixin):
 
 
 # Base views
-class UserLoggedOutView(RedirectLoggedInMixin, TemplateView):
-    """
-    Renders a templates for an unauthenticated user. Redirects logged in users.
-    """
-    template_name = None
-
-class UserLoggedInView(LoginRequiredMixin, TemplateView):
-    """
-    Renders a template for an authenticated user. Required users to be logged in.
-    """
-    template_name = None
-
 class BaseFormView(SuccessMessageMixin, FormView):
     """
     Base form view.
     """
-    template_name = form_page
+    template_name = FORM_PAGE
+
 
 class BaseUserFormView(BaseFormView):
     """
@@ -209,24 +199,24 @@ class EmailRedirectView(RedirectView):
         return redirect(self.url)
 
 # Basic pages
-class Index(UserLoggedOutView):
+class IndexView(RedirectLoggedInMixin, TemplateView):
     """
     Renders the home page.
     """
     redirect_url = 'home'
-    template_name = base_page
+    template_name = BASE_PAGE
 
-class Home(UserLoggedInView):
+class HomeView(LoginRequiredMixin, TemplateView):
     """
     Renders the home page.
     """
-    template_name = home_page
+    template_name = HOME_PAGE
 
-class ProfileView(UserLoggedInView):
+class ProfileView(LoginRequiredMixin, TemplateView):
     """
     Renders the profile page.
     """
-    template_name = profile_page
+    template_name = PROFILE_PAGE
     extra_context = None
 
     def get_context_data(self, *args, **kwargs):
@@ -237,27 +227,62 @@ class ProfileView(UserLoggedInView):
         context['profile'] = Profile.objects.filter(user__username=slug)
         return context
 
-class EditProfileView(BaseUserFormView, UpdateView):
+class EditProfileView(UserPassesTestMixin, LoginRequiredMixin, BaseUserFormView, UpdateView):
     """
     Renders theedit  profile form.
     """
     form_class = UpdateProfileForm 
     slug_field = 'username' 
+    redirect_url = 'home'
     extra_context = {
         'title': 'Edit your profile',
     }
-    success_url = reverse_lazy('settings')
     success_message = 'Your profile has been updated!'
 
-class Settings(UserLoggedInView):
+    def get_success_url(self):
+        """
+        """
+        username = self.kwargs['slug']
+        return reverse_lazy('profile', kwargs={'slug': username})
+
+    def get_redirect_url(self):
+        redirect_url = self.redirect_url
+        if not redirect_url:
+            raise ImproperlyConfigured(
+                '{0} is missing the redirect_url attribute. Define {0}.redirect_url or override '
+                '{0}.get_redirect_url().'.format(self.__class__.__name__)
+            )
+        return str(redirect_url)
+
+    def handle_no_permission(self):
+        return redirect(self.get_redirect_url())
+
+    def test_func(self):
+        authorized = False
+        if self.request.user.username == self.kwargs['slug']:
+            authorized = True
+        print(self.request.user.username, self.kwargs['slug'])
+        return authorized
+
+class FriendsListView(LoginRequiredMixin, TemplateView):
+    """
+    """
+    template_name = FRIENDS_LIST_PAGE
+
+class FriendRequestView(LoginRequiredMixin, BaseUserFormView):
+    """
+    Renders a form to submit a friend request.
+    """
+
+class SettingsView(LoginRequiredMixin, TemplateView):
     """
     Renders the settings page.
     """
-    template_name = settings_page
+    template_name = SETTINGS_PAGE
 
 
 # User authentication views
-class Register(EmailVerificationMixin, BaseAuthView, CreateView):
+class RegisterView(EmailVerificationMixin, BaseAuthView, CreateView):
     """
     Renders the register page to create a new user. 
     """
@@ -269,13 +294,13 @@ class Register(EmailVerificationMixin, BaseAuthView, CreateView):
     success_message = 'You have successfully created your account! Please check your email for a verification link.'
 
 
-class Activate(EmailRedirectView):
+class ActivateView(EmailRedirectView):
     """
     Activates a user account. Redirects to login.
     """
     url = 'login'
     
-class Login(EmailVerificationMixin, BaseAuthView, LoginView):
+class LoginView(EmailVerificationMixin, BaseAuthView, LoginView):
     """
     Renders the login page. 
     """
@@ -305,17 +330,13 @@ class Login(EmailVerificationMixin, BaseAuthView, LoginView):
             messages.error(self.request, 'Incorrect email or password!')  
         return redirect('login')
 
-class Logout(LogoutView):
+class LogoutView(LogoutView):
     """
     Logs the current user out.
     """
     next_page = 'login'
 
-class UpdateProfileView():
-    """
-    """
-
-class UpdateEmail(EmailVerificationMixin, BaseUserFormView, UpdateView):
+class UpdateEmailView(LoginRequiredMixin, EmailVerificationMixin, BaseUserFormView, UpdateView):
     """
     Renders the update email page.
     """
@@ -327,13 +348,13 @@ class UpdateEmail(EmailVerificationMixin, BaseUserFormView, UpdateView):
     success_url = reverse_lazy('settings')
     success_message = 'Your email has been updated! Please check your email for a verification link.'
 
-class VerifyEmail(EmailRedirectView):
+class VerifyEmailView(EmailRedirectView):
     """
-    Activates a user account. Redirects to login.
+    Verifies a new user account. Redirects to login.
     """
     url = 'login'
 
-class UpdatePassword(BaseUserFormView, PasswordChangeView):
+class UpdatePasswordView(LoginRequiredMixin, BaseUserFormView, PasswordChangeView):
     """
     Renders the update password page so a user can update their password.
     """
@@ -345,18 +366,18 @@ class UpdatePassword(BaseUserFormView, PasswordChangeView):
     success_url = reverse_lazy('settings')
     success_message = 'You have successfully changed your password!'
 
-class ResetPasswordRequest(BaseUserFormView, PasswordResetView):
+class ResetPasswordRequestView(BaseUserFormView, PasswordResetView):
     """
     Renders the reset password request page to request a password reset link be sent to users email. Redirects back to settings.
     """
     form_class = ResetPasswordRequestForm
-    email_template_name = reset_password_email
-    subject_template_name = reset_password_subject
+    email_template_name = RESET_PASSWORD_EMAIL
+    subject_template_name = RESET_PASSWORD_SUBJECT
     title = 'Password reset request'
     success_url = reverse_lazy('settings')
     success_message = 'You have submitted a password reset request! Please check your email for instructions.'
 
-class ResetPassword(BaseUserFormView, PasswordResetConfirmView):
+class ResetPasswordView(BaseUserFormView, PasswordResetConfirmView):
     """
     Renders the reset password page so a user can create a new password. Redirects to login page. 
     """
@@ -370,7 +391,7 @@ class ResetPassword(BaseUserFormView, PasswordResetConfirmView):
     success_url = reverse_lazy('index')
     success_message = 'You have reset your password!'
 
-class DeleteAccount(BaseUserFormView, DeleteView):
+class DeleteAccountView(LoginRequiredMixin, BaseUserFormView, DeleteView):
     """
     Renders the delete account page so a user can delete their account.
     """

@@ -116,6 +116,16 @@ class UpdateProfileForm(forms.ModelForm):
     """
     Creates an update profile form. 
     """
+    profile_image = forms.FileField(
+        widget=forms.ClearableFileInput(
+            attrs = {
+                'placeholder': 'Display name',
+            }
+        ), 
+        label='Profle picture',
+        required=False,
+    )
+
     display_name = forms.CharField(
         widget=forms.TextInput(
             attrs = {
@@ -123,13 +133,24 @@ class UpdateProfileForm(forms.ModelForm):
             }
         ), 
         label='Display name',
+        required=False,
+    )
+
+    biography = forms.CharField(
+        widget=forms.Textarea(
+            attrs = {
+                'placeholder': 'Enter a short bio...',
+            }
+        ), 
+        label='Biography',
+        required=False,
     )
     
-    field_order = ('display_name',)
+    field_order = ('profile_image', 'display_name', 'biography',)
     
     class Meta:
         model = Profile
-        fields = ('display_name',)
+        fields = ('profile_image', 'display_name','biography',)
 
     def __init__(self, *args, **kwargs):
         super(UpdateProfileForm, self).__init__(*args, **kwargs)

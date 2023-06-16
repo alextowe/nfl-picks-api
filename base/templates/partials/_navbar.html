@@ -16,18 +16,33 @@
                 Hi, {{ user.username }}!
               </span>
             </li>
-            <li><a class="dropdown-item" href="{% url 'index' %}">
-                <i class="fa-solid fa-house me-3"></i>Home</a></li>
-            <li><a class="dropdown-item" href="{% url 'profile' user.username %}">
-                <i class="fa-solid fa-user me-3"></i>My Profile</a></li>
-            <li><a class="dropdown-item" href="{% url 'settings' %}">
-                <i class="fa-solid fa-gear me-3"></i>Settings</a></li>
+            <li>
+              <a class="dropdown-item" href="{% url 'index' %}">
+                <i class="fa-solid fa-house text-center me-3" style="width: 22px;"></i>Home
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="{% url 'profile' user.username %}">
+                  <i class="fa-solid fa-user text-center me-3" style="width: 22px;"></i>My Profile
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="{% url 'friends' user.username %}">
+                  <i class="fa-solid fa-user-group text-center me-3" style="width: 22px;"></i>Friends
+              </a>
+            </li>
+            
+            <li>
+              <a class="dropdown-item" href="{% url 'settings' %}">
+                <i class="fa-solid fa-gear text-center me-3" style="width: 22px;"></i>Settings
+              </a>
+            </li>
             <li>
               <hr class="dropdown-divider">
             </li>
             <li>
               <a class="dropdown-item" href="javascript:{document.getElementById('logout').submit()}">
-                <i class="fa-solid fa-right-from-bracket me-3"></i>Logout
+                <i class="fa-solid fa-right-from-bracket text-center me-3" style="width: 22px;"></i>Logout
               </a>
               <form action="{% url 'logout' %}" method="POST" id="logout">
                 {% csrf_token %}
