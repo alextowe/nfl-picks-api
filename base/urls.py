@@ -6,7 +6,7 @@ from .views import (
     Activate,
     Login, 
     Logout, 
-    Profile, 
+    ProfileView, 
     Settings, 
     UpdateEmail, 
     VerifyEmail,
@@ -24,7 +24,7 @@ urlpatterns = [
     path('login/', Login.as_view(), name='login'),
     path('logout/', Logout.as_view(), name='logout'),
 
-    path('profile/<slug>/', Profile.as_view(), name='profile'),
+    path('profile/<slug>/', ProfileView.as_view(), name='profile'),
     
     path('settings/', Settings.as_view(), name='settings'),
     path('settings/update-email/<slug>/', UpdateEmail.as_view(), name='update-email'),

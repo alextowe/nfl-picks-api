@@ -221,12 +221,20 @@ class Home(UserLoggedInView):
     """
     template_name = home_page
 
-class Profile(UserLoggedInView):
+class ProfileView(UserLoggedInView):
     """
     Renders the profile page.
     """
     template_name = profile_page
-    
+    extra_context = None
+
+    def get_context_data(self, *args, **kwargs):
+        """
+        """
+        context = super(ProfileView, self).get_context_data(**kwargs)
+        slug = self.kwargs['slug']
+        context['profile'] = Profile.objects.filter(user__username=slug)
+        return context
 
 class Settings(UserLoggedInView):
     """

@@ -1,7 +1,4 @@
 {% extends 'base.html' %}
-
-{% load static %}
-
 {% block title %} | My Profile {% endblock%}
 
 {% block content %}
@@ -12,17 +9,15 @@
             <div class="col-lg-8 offset-lg-2">
                 {% include 'partials/_alerts.html' %}
                 <div class="d-flex flex-column align-items-center p-3 border-3 border-bottom border-dark">
-                    <img src="{% static 'base/profile_picture.jpg' %}" alt="Profile picture" style="width:250px; height:250px;" class="rounded-circle border border-3 border-dark">
-                    <div class="text-center">
-                        <h1 class="h1 my-3">
-                            {% if user.profile.display_name %}
-                                {{ user.profile.display_name }}
-                            {% else %}
-                                {{ user.username }}
-                            {% endif %}
-                        </h1>
-                        <p class="lead pb-3 mb-4 ">{{ user.profile.biography }}</p>   
-                    </div>
+                    {% for profile in profile %}
+                        <img src="{{ profile.profile_image.url }}" alt="Profile picture" style="width:250px; height:250px;" class="rounded-circle border border-3 border-dark">
+                        <div class="text-center">
+                            <h1 class="h1 my-3">
+                                {{ profile.display_name }}
+                            </h1>
+                            <p class="lead pb-3 mb-4">{{ profile.biography }}</p>   
+                        </div>
+                    {% endfor %}                  
                 </div>
             </div>
         </div>
