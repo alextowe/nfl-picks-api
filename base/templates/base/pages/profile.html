@@ -17,6 +17,9 @@
                             </h1>
                             <p class="lead pb-3 mb-4">{{ profile.biography }}</p>   
                         </div>
+                        {% if profile.display_name == user.username %}
+                            <a class="btn btn-dark"href="{% url 'edit-profile' user.username %}">Edit profile</a>
+                        {% endif %}
                     {% endfor %}                  
                 </div>
             </div>

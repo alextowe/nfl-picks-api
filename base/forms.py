@@ -17,6 +17,9 @@ from django.contrib.auth.forms import (
     SetPasswordForm,
 )
 
+# Import models
+from .models import Profile
+
 # User authentication forms
 class RegisterForm(UserCreationForm):
     """
@@ -107,6 +110,29 @@ class LoginForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
         super(LoginForm, self).__init__(*args, **kwargs)
         self.fields.pop('username')
+
+# User profile form
+class UpdateProfileForm(forms.ModelForm):
+    """
+    Creates an update profile form. 
+    """
+    display_name = forms.CharField(
+        widget=forms.TextInput(
+            attrs = {
+                'placeholder': 'Display name',
+            }
+        ), 
+        label='Display name',
+    )
+    
+    field_order = ('display_name',)
+    
+    class Meta:
+        model = Profile
+        fields = ('display_name',)
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateProfileForm, self).__init__(*args, **kwargs)
 
 # User settings forms
 class UpdateEmailForm(forms.ModelForm):

@@ -63,6 +63,7 @@ from django.views.generic.detail import SingleObjectMixin
 from .forms import (
     RegisterForm, 
     LoginForm, 
+    UpdateProfileForm,
     UpdateEmailForm, 
     UpdatePasswordForm,   
     ResetPasswordRequestForm, 
@@ -235,6 +236,18 @@ class ProfileView(UserLoggedInView):
         slug = self.kwargs['slug']
         context['profile'] = Profile.objects.filter(user__username=slug)
         return context
+
+class EditProfileView(BaseUserFormView, UpdateView):
+    """
+    Renders theedit  profile form.
+    """
+    form_class = UpdateProfileForm 
+    slug_field = 'username' 
+    extra_context = {
+        'title': 'Edit your profile',
+    }
+    success_url = reverse_lazy('settings')
+    success_message = 'Your profile has been updated!'
 
 class Settings(UserLoggedInView):
     """

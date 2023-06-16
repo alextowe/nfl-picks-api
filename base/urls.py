@@ -7,6 +7,7 @@ from .views import (
     Login, 
     Logout, 
     ProfileView, 
+    EditProfileView,
     Settings, 
     UpdateEmail, 
     VerifyEmail,
@@ -25,6 +26,7 @@ urlpatterns = [
     path('logout/', Logout.as_view(), name='logout'),
 
     path('profile/<slug>/', ProfileView.as_view(), name='profile'),
+    path('profile/<slug>/edit/', EditProfileView.as_view(), name='edit-profile'),
     
     path('settings/', Settings.as_view(), name='settings'),
     path('settings/update-email/<slug>/', UpdateEmail.as_view(), name='update-email'),
