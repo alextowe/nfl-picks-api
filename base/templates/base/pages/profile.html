@@ -1,4 +1,7 @@
 {% extends 'base.html' %}
+
+{% load static %}
+
 {% block title %} | My Profile {% endblock%}
 
 {% block content %}
@@ -7,23 +10,40 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-8 offset-lg-2">
-                {% include 'partials/_alerts.html' %}
+                {% include 'partials/_alerts.html' %}   
                 <div class="d-flex flex-column align-items-center p-3 border-3 border-bottom border-dark">
-                    {% for profile in profile %}
-                        <img src="{{ profile.profile_image.url }}" alt="Profile picture" style="width:250px; height:250px;" class="rounded-circle border border-3 border-dark">
-                        <div class="text-center">
-                            <h1 class="h1 my-3">
-                                {{ profile.display_name }}
-                            </h1>
-                            <p class="lead pb-3 mb-4">{{ profile.biography }}</p>   
-                        </div>
-                        {% if profile.display_name == user.username %}
-                            <a class="btn btn-dark"href="{% url 'edit-profile' user.username %}">Edit profile</a>
+                    <img src="
+                        {% if profile.profile_image %} 
+                            {{ profile.profile_image.url }}
+                        {% else %}
+                            {% static 'base/profile_picture.jpg'%}
                         {% endif %}
-
-                        {{ profile.user.friends }}
-                    {% endfor %}                  
+                    " alt="Profile picture" style="width:250px; height:250px;" class="rounded-circle border border-3 border-dark">
+                    <div class="text-center">
+                        <h1 class="h1 my-3">
+                            {{ profile.display_name }}
+                        </h1>
+                        <p class="lead pb-3 mb-4">{{ profile.biography }}</p>   
+                    </div>
+                    {% if profile.user == user %}
+                        <a class="btn btn-dark"href="{% url 'edit-profile' user.username %}">Edit profile</a>
+                    {% endif %}                                 
                 </div>
+                <div class="p-3">
+                    {% if profile.user != user %}
+                        <h2 class="">Mutual friends</h2> 
+                        {% if mutual_friends %}
+                            <div class=" list-group mb-3">
+                                    {% for friend in mutual_friends %}
+                                        <a href="{% url 'profile' friend.username %}" class="list-group-item">{{ friend.profile.display_name }}</a>
+                                    {% endfor %}
+                            </div>
+                            {% endif %}        
+                    {% else %}
+                        <h2 class="mb-4">View your friends</h2> 
+                    {% endif %}
+                    <a class="btn btn-dark"href="{% url 'friends' profile.user.username %}">View all friends</a>
+                </div>                              
             </div>
         </div>
     </div>

@@ -112,7 +112,7 @@ class LoginForm(AuthenticationForm):
         self.fields.pop('username')
 
 # User profile form
-class UpdateProfileForm(forms.ModelForm):
+class EditProfileForm(forms.ModelForm):
     """
     Creates an update profile form. 
     """
@@ -153,7 +153,7 @@ class UpdateProfileForm(forms.ModelForm):
         fields = ('profile_image', 'display_name','biography',)
 
     def __init__(self, *args, **kwargs):
-        super(UpdateProfileForm, self).__init__(*args, **kwargs)
+        super(EditProfileForm, self).__init__(*args, **kwargs)
 
 # User settings forms
 class UpdateEmailForm(forms.ModelForm):

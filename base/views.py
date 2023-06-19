@@ -63,7 +63,7 @@ from django.views.generic.detail import SingleObjectMixin
 from .forms import (
     RegisterForm, 
     LoginForm, 
-    UpdateProfileForm,
+    EditProfileForm,
     UpdateEmailForm, 
     UpdatePasswordForm,   
     ResetPasswordRequestForm, 
@@ -113,6 +113,30 @@ class RedirectLoggedInMixin(UserPassesTestMixin):
 
     def test_func(self):
         return not self.request.user.is_authenticated
+
+class RedirectWrongUserMixin(UserPassesTestMixin):
+    """
+    Redirects a user when they try to visit an edit page for another user. 
+    """
+    redirect_url = None
+
+    def get_redirect_url(self):
+        redirect_url = self.redirect_url
+        if not redirect_url:
+            raise ImproperlyConfigured(
+                '{0} is missing the redirect_url attribute. Define {0}.redirect_url or override '
+                '{0}.get_redirect_url().'.format(self.__class__.__name__)
+            )
+        return str(redirect_url)
+
+    def handle_no_permission(self):
+        return redirect(self.get_redirect_url())
+
+    def test_func(self):
+        authorized = False
+        if self.request.user.username == self.kwargs['slug']:
+            authorized = True
+        return authorized
 
 class EmailVerificationMixin(FormMixin):
     """
@@ -224,15 +248,25 @@ class ProfileView(LoginRequiredMixin, TemplateView):
         """
         context = super(ProfileView, self).get_context_data(**kwargs)
         slug = self.kwargs['slug']
-        context['profile'] = Profile.objects.filter(user__username=slug)
+        profile = Profile.objects.filter(user__username=slug)[0]
+        mutual_friends = []
+
+        for friend in profile.user.friends.all():
+            if friend in self.request.user.friends.all():
+                mutual_friends.append(friend)
+
+        context['profile'] = profile
+        context['mutual_friends'] = mutual_friends
         return context
 
-class EditProfileView(UserPassesTestMixin, LoginRequiredMixin, BaseUserFormView, UpdateView):
+class EditProfileView(SuccessMessageMixin, LoginRequiredMixin, RedirectWrongUserMixin, UpdateView):
     """
-    Renders theedit  profile form.
+    Renders the edit  profile form.
     """
-    form_class = UpdateProfileForm 
-    slug_field = 'username' 
+    template_name = FORM_PAGE
+    form_class = EditProfileForm 
+    model = Profile
+    slug_field = 'user__username' 
     redirect_url = 'home'
     extra_context = {
         'title': 'Edit your profile',
@@ -245,29 +279,22 @@ class EditProfileView(UserPassesTestMixin, LoginRequiredMixin, BaseUserFormView,
         username = self.kwargs['slug']
         return reverse_lazy('profile', kwargs={'slug': username})
 
-    def get_redirect_url(self):
-        redirect_url = self.redirect_url
-        if not redirect_url:
-            raise ImproperlyConfigured(
-                '{0} is missing the redirect_url attribute. Define {0}.redirect_url or override '
-                '{0}.get_redirect_url().'.format(self.__class__.__name__)
-            )
-        return str(redirect_url)
-
-    def handle_no_permission(self):
-        return redirect(self.get_redirect_url())
-
-    def test_func(self):
-        authorized = False
-        if self.request.user.username == self.kwargs['slug']:
-            authorized = True
-        print(self.request.user.username, self.kwargs['slug'])
-        return authorized
+    
 
 class FriendsListView(LoginRequiredMixin, TemplateView):
     """
     """
     template_name = FRIENDS_LIST_PAGE
+    extra_context = None
+
+    def get_context_data(self, *args, **kwargs):
+        """
+        """
+        context = super(FriendsListView, self).get_context_data(**kwargs)
+        slug = self.kwargs['slug']
+        context['user_for_friends_list'] = User.objects.filter(username=slug)
+        print(context['user_for_friends_list'])
+        return context
 
 class FriendRequestView(LoginRequiredMixin, BaseUserFormView):
     """
