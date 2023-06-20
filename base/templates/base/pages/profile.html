@@ -34,15 +34,16 @@
                         <h2 class="">Mutual friends</h2> 
                         {% if mutual_friends %}
                             <div class=" list-group mb-3">
-                                    {% for friend in mutual_friends %}
-                                        <a href="{% url 'profile' friend.username %}" class="list-group-item">{{ friend.profile.display_name }}</a>
-                                    {% endfor %}
+                                {% for friend in mutual_friends %}
+                                    <a href="{% url 'profile' friend.username %}" class="list-group-item">{{ friend.profile.display_name }}</a>
+                                {% endfor %}
                             </div>
-                            {% endif %}        
-                    {% else %}
-                        <h2 class="mb-4">View your friends</h2> 
+                        {% else %}
+                            <p class="">You don't have any mutual friends with {{ profile.display_name }}!</p>
+                        {% endif %}
+                        <a class="btn btn-dark"href="{% url 'friends' profile.user.username %}">View {{profile.display_name }}'s friends</a>   
                     {% endif %}
-                    <a class="btn btn-dark"href="{% url 'friends' profile.user.username %}">View all friends</a>
+                    
                 </div>                              
             </div>
         </div>

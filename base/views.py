@@ -249,11 +249,12 @@ class ProfileView(LoginRequiredMixin, TemplateView):
         context = super(ProfileView, self).get_context_data(**kwargs)
         slug = self.kwargs['slug']
         profile = Profile.objects.filter(user__username=slug)[0]
-        mutual_friends = []
-
-        for friend in profile.user.friends.all():
-            if friend in self.request.user.friends.all():
-                mutual_friends.append(friend)
+        profile_friends = profile.user.friends.values_list('username', flat=True)
+        mutual_friends = self.request.user.friends.filter(username__in=profile_friends)
+        if self.request.user.username in profile_friends:
+            print('This user is your friend!\n')
+        else:
+            print('This user is not your friend!\n')
 
         context['profile'] = profile
         context['mutual_friends'] = mutual_friends
@@ -293,7 +294,6 @@ class FriendsListView(LoginRequiredMixin, TemplateView):
         context = super(FriendsListView, self).get_context_data(**kwargs)
         slug = self.kwargs['slug']
         context['user_for_friends_list'] = User.objects.filter(username=slug)
-        print(context['user_for_friends_list'])
         return context
 
 class FriendRequestView(LoginRequiredMixin, BaseUserFormView):
