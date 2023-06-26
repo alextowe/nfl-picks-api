@@ -252,9 +252,9 @@ class ProfileView(LoginRequiredMixin, TemplateView):
         profile_friends = profile.user.friends.values_list('username', flat=True)
         mutual_friends = self.request.user.friends.filter(username__in=profile_friends)
         if self.request.user.username in profile_friends:
-            print('This user is your friend!\n')
+            context['is_friend'] = True
         else:
-            print('This user is not your friend!\n')
+            context['is_friend'] = False
 
         context['profile'] = profile
         context['mutual_friends'] = mutual_friends

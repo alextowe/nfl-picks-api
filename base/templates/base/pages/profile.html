@@ -27,7 +27,11 @@
                     </div>
                     {% if profile.user == user %}
                         <a class="btn btn-dark"href="{% url 'edit-profile' user.username %}">Edit profile</a>
-                    {% endif %}                                 
+                    {% endif %}
+                    
+                    {% if not is_friend %}
+                        <a class="btn btn-dark"href="{% url 'home' %}">Add friend</a>
+                    {% endif %}
                 </div>
                 <div class="p-3">
                     {% if profile.user != user %}
