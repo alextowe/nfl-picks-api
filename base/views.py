@@ -315,6 +315,14 @@ class FriendRequestView(LoginRequiredMixin, BaseUserFormView):
             to_user__slug=self.kwargs['to_user'],
             slug=self.kwargs['slug'],
         )
+    def get_context_data(self, *args, **kwargs):
+        """
+        """
+        context = super(FriendRequestView, self).get_context_data(**kwargs)
+        to_user = self.kwargs['to_user']
+        profile = Profile.objects.filter(user__username=to_user)[0]
+        context['profile'] = profile
+        return context   
 
     def get_success_url(self):
         """
