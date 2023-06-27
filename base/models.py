@@ -37,7 +37,7 @@ class Profile(models.Model):
 
     def save(self, *args, **kwargs):
         """
-        Overides the same function to set the default display name to the username. 
+        Overides the save function to set the default display name to the username. 
         """
 
         if not self.display_name:

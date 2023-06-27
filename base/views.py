@@ -64,6 +64,7 @@ from .forms import (
     RegisterForm, 
     LoginForm, 
     EditProfileForm,
+    FriendRequestForm,
     UpdateEmailForm, 
     UpdatePasswordForm,   
     ResetPasswordRequestForm, 
@@ -81,6 +82,7 @@ from .tokens import email_token_generator
 BASE_PAGE = 'base/pages/index.html'
 HOME_PAGE = 'base/pages/home.html'
 PROFILE_PAGE = 'base/pages/profile.html'
+ADD_FRIEND_FORM = 'base/pages/add_friend.html'
 FRIENDS_LIST_PAGE = 'base/pages/friends.html'
 SETTINGS_PAGE = 'base/pages/settings.html'
 FORM_PAGE = 'base/pages/form_page.html'
@@ -230,17 +232,18 @@ class IndexView(RedirectLoggedInMixin, TemplateView):
     redirect_url = 'home'
     template_name = BASE_PAGE
 
-class HomeView(LoginRequiredMixin, TemplateView):
+class HomeView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
     """
     Renders the home page.
     """
     template_name = HOME_PAGE
 
-class ProfileView(LoginRequiredMixin, TemplateView):
+class ProfileView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
     """
     Renders the profile page.
     """
     template_name = PROFILE_PAGE
+    form_class = FriendRequestForm
     extra_context = None
 
     def get_context_data(self, *args, **kwargs):
@@ -258,7 +261,7 @@ class ProfileView(LoginRequiredMixin, TemplateView):
 
         context['profile'] = profile
         context['mutual_friends'] = mutual_friends
-        return context
+        return context    
 
 class EditProfileView(SuccessMessageMixin, LoginRequiredMixin, RedirectWrongUserMixin, UpdateView):
     """
@@ -278,9 +281,7 @@ class EditProfileView(SuccessMessageMixin, LoginRequiredMixin, RedirectWrongUser
         """
         """
         username = self.kwargs['slug']
-        return reverse_lazy('profile', kwargs={'slug': username})
-
-    
+        return reverse_lazy('profile', kwargs={'slug': username})  
 
 class FriendsListView(LoginRequiredMixin, TemplateView):
     """
@@ -300,13 +301,32 @@ class FriendRequestView(LoginRequiredMixin, BaseUserFormView):
     """
     Renders a form to submit a friend request.
     """
+    template_name = ADD_FRIEND_FORM
+    form_class = FriendRequestForm
+    extra_context = {
+        'title': 'Add a new friend!',
+    }
+    success_url = reverse_lazy('home')
+    success_message = 'You have successfully added a new friend!'
+
+    def get_object(self):
+        return get_object_or_404(
+            Town,   
+            to_user__slug=self.kwargs['to_user'],
+            slug=self.kwargs['slug'],
+        )
+
+    def get_success_url(self):
+        """
+        """
+        username = self.kwargs['to_user']
+        return reverse_lazy('profile', kwargs={'slug': username})  
 
 class SettingsView(LoginRequiredMixin, TemplateView):
     """
     Renders the settings page.
     """
     template_name = SETTINGS_PAGE
-
 
 # User authentication views
 class RegisterView(EmailVerificationMixin, BaseAuthView, CreateView):
@@ -319,7 +339,6 @@ class RegisterView(EmailVerificationMixin, BaseAuthView, CreateView):
     }
     success_url = 'login'
     success_message = 'You have successfully created your account! Please check your email for a verification link.'
-
 
 class ActivateView(EmailRedirectView):
     """
