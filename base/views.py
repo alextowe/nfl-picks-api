@@ -253,13 +253,6 @@ class ProfileView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
         user_following = self.request.user.following.values_list('username', flat=True)
         profile_following = profile.user.following.values_list('username', flat=True)
 
-        print('Current user:', self.request.user, '\nProfile user:', profile.user,'\nUser following:', self.request.user.following.values_list('username', flat=True), '\nProfile following:', profile.user.following.values_list('username', flat=True))
-        if profile.user.username in self.request.user.following.values_list('username', flat=True):
-            print(self.request.user.username, 'is following', profile.user.username)
-        if self.request.user.username in profile.user.following.values_list('username', flat=True):
-            print(profile.user.username, 'is following', self.request.user.username)
-
-
         if profile.user.username in user_following:
             context['is_following'] = True
         else:
