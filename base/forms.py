@@ -155,17 +155,6 @@ class EditProfileForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(EditProfileForm, self).__init__(*args, **kwargs)
 
-class FriendRequestForm(forms.Form):
-    """
-    Creates a friend request form. 
-    """
-
-    class Meta:
-        model = get_user_model()
-
-    def __init__(self, *args, **kwargs):
-        super(FriendRequestForm, self).__init__(*args, **kwargs)
-
 # User settings forms
 class UpdateEmailForm(forms.ModelForm):
     """

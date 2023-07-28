@@ -8,8 +8,7 @@ from .views import (
     LogoutView, 
     ProfileView, 
     EditProfileView,
-    FriendsListView,
-    FriendRequestView,
+    FollowingListView,
     SettingsView, 
     UpdateEmailView, 
     VerifyEmailView,
@@ -30,8 +29,7 @@ urlpatterns = [
     path('profile/<slug>/', ProfileView.as_view(), name='profile'),
     path('profile/<slug>/edit/', EditProfileView.as_view(), name='edit-profile'),
 
-    path('friends/<slug>/', FriendsListView.as_view(), name='friends'),
-    path('<slug:slug>/add-friend/<slug:to_user>', FriendRequestView.as_view(), name='friend-request'),
+    path('friends/<slug>/', FollowingListView.as_view(), name='friends'),
     
     path('settings/', SettingsView.as_view(), name='settings'),
     path('settings/update-email/<slug>/', UpdateEmailView.as_view(), name='update-email'),

@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %} | Friends List{% endblock%}
+{% block title %} | Following List{% endblock%}
 
 {% block content %}
 <!-- Profile -->
@@ -8,11 +8,11 @@
         <div class="row">
             <div class="col-lg-8 offset-lg-2">
                 {% include 'partials/_alerts.html' %}
-                {% for user in user_for_friends_list %}
-                    <h1 class="border-3 border-bottom border-dark pb-3">{{ user.profile.display_name }}'s Friends</h1>
+                {% for user in user_for_following_list %}
+                    <h1 class="border-3 border-bottom border-dark pb-3">{{ user.profile.display_name }}'s Following List</h1>
                     <div class="d-flex flex-column p-3">
-                        {% for friend in user.friends.all %}
-                            <a href="{% url 'profile' friend.username %}">{{ friend.profile.display_name }}</a>
+                        {% for user in user.following.all %}
+                            <a href="{% url 'profile' user.username %}">{{ user.profile.display_name }}</a>
                         {% endfor %}
                     </div>
                 {% endfor %}                  

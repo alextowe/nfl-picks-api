@@ -64,7 +64,6 @@ from .forms import (
     RegisterForm, 
     LoginForm, 
     EditProfileForm,
-    FriendRequestForm,
     UpdateEmailForm, 
     UpdatePasswordForm,   
     ResetPasswordRequestForm, 
@@ -73,7 +72,7 @@ from .forms import (
 )
 
 # Import models 
-from .models import Profile, FriendRequest
+from .models import Profile
 
 # Import tokens
 from .tokens import email_token_generator
@@ -83,7 +82,7 @@ BASE_PAGE = 'base/pages/index.html'
 HOME_PAGE = 'base/pages/home.html'
 PROFILE_PAGE = 'base/pages/profile.html'
 ADD_FRIEND_FORM = 'base/pages/add_friend.html'
-FRIENDS_LIST_PAGE = 'base/pages/friends.html'
+FOLLOWING_LIST_PAGE = 'base/pages/following.html'
 SETTINGS_PAGE = 'base/pages/settings.html'
 FORM_PAGE = 'base/pages/form_page.html'
 ACCOUNT_VERIFICATION_EMAIL = 'base/emails/email_verification.html'
@@ -243,7 +242,6 @@ class ProfileView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
     Renders the profile page.
     """
     template_name = PROFILE_PAGE
-    form_class = FriendRequestForm
     extra_context = None
 
     def get_context_data(self, *args, **kwargs):
@@ -252,15 +250,27 @@ class ProfileView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
         context = super(ProfileView, self).get_context_data(**kwargs)
         slug = self.kwargs['slug']
         profile = Profile.objects.filter(user__username=slug)[0]
-        profile_friends = profile.user.friends.values_list('username', flat=True)
-        mutual_friends = self.request.user.friends.filter(username__in=profile_friends)
-        if self.request.user.username in profile_friends:
-            context['is_friend'] = True
+        user_following = self.request.user.following.values_list('username', flat=True)
+        profile_following = profile.user.following.values_list('username', flat=True)
+
+        print('Current user:', self.request.user, '\nProfile user:', profile.user,'\nUser following:', self.request.user.following.values_list('username', flat=True), '\nProfile following:', profile.user.following.values_list('username', flat=True))
+        if profile.user.username in self.request.user.following.values_list('username', flat=True):
+            print(self.request.user.username, 'is following', profile.user.username)
+        if self.request.user.username in profile.user.following.values_list('username', flat=True):
+            print(profile.user.username, 'is following', self.request.user.username)
+
+
+        if profile.user.username in user_following:
+            context['is_following'] = True
         else:
-            context['is_friend'] = False
+            context['is_following'] = False
+
+        if self.request.user.username in profile_following:
+            context['is_follower'] = True
+        else:
+            context['is_follower'] = False
 
         context['profile'] = profile
-        context['mutual_friends'] = mutual_friends
         return context    
 
 class EditProfileView(SuccessMessageMixin, LoginRequiredMixin, RedirectWrongUserMixin, UpdateView):
@@ -283,52 +293,19 @@ class EditProfileView(SuccessMessageMixin, LoginRequiredMixin, RedirectWrongUser
         username = self.kwargs['slug']
         return reverse_lazy('profile', kwargs={'slug': username})  
 
-class FriendsListView(LoginRequiredMixin, TemplateView):
+class FollowingListView(LoginRequiredMixin, TemplateView):
     """
     """
-    template_name = FRIENDS_LIST_PAGE
+    template_name = FOLLOWING_LIST_PAGE
     extra_context = None
 
     def get_context_data(self, *args, **kwargs):
         """
         """
-        context = super(FriendsListView, self).get_context_data(**kwargs)
+        context = super(FollowingListView, self).get_context_data(**kwargs)
         slug = self.kwargs['slug']
-        context['user_for_friends_list'] = User.objects.filter(username=slug)
+        context['user_for_following_list'] = User.objects.filter(username=slug)
         return context
-
-class FriendRequestView(LoginRequiredMixin, BaseUserFormView):
-    """
-    Renders a form to submit a friend request.
-    """
-    template_name = ADD_FRIEND_FORM
-    form_class = FriendRequestForm
-    extra_context = {
-        'title': 'Add a new friend!',
-    }
-    success_url = reverse_lazy('home')
-    success_message = 'You have successfully added a new friend!'
-
-    def get_object(self):
-        return get_object_or_404(
-            Town,   
-            to_user__slug=self.kwargs['to_user'],
-            slug=self.kwargs['slug'],
-        )
-    def get_context_data(self, *args, **kwargs):
-        """
-        """
-        context = super(FriendRequestView, self).get_context_data(**kwargs)
-        to_user = self.kwargs['to_user']
-        profile = Profile.objects.filter(user__username=to_user)[0]
-        context['profile'] = profile
-        return context   
-
-    def get_success_url(self):
-        """
-        """
-        username = self.kwargs['to_user']
-        return reverse_lazy('profile', kwargs={'slug': username})  
 
 class SettingsView(LoginRequiredMixin, TemplateView):
     """
