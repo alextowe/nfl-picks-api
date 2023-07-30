@@ -18,7 +18,7 @@ from django.contrib.auth.forms import (
 )
 
 # Import models
-from .models import Profile
+from .models import Profile, FriendRequest
 User = get_user_model()
 
 
@@ -58,6 +58,15 @@ class EditProfileForm(forms.ModelForm):
         required=False,
     )
     
+    display_name = forms.CharField(
+        widget=forms.TextInput(
+            attrs = {
+                'placeholder': 'Display name',
+            }
+        ), 
+        label='Display name',
+    )
+
     field_order = ('profile_image', 'display_name', 'biography',)
     
     class Meta:
@@ -67,13 +76,18 @@ class EditProfileForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(EditProfileForm, self).__init__(*args, **kwargs)
 
-class FriendRequestForm(forms.Form):
+class FriendRequestForm(forms.ModelForm):
     """
     Creates a friend request form. 
     """
 
     class Meta:
-        model = get_user_model()
+        model = FriendRequest
+        exclude = ('request_date', 'is_accepted', 'accepted_on')
+        widgets = {
+            'from_user': forms.HiddenInput(),
+            'to_user': forms.HiddenInput(),
+        }
 
     def __init__(self, *args, **kwargs):
         super(FriendRequestForm, self).__init__(*args, **kwargs)
@@ -128,7 +142,7 @@ class RegisterForm(UserCreationForm):
     field_order = ('username', 'email', 'password1', 'password2')
     
     class Meta:
-        model = get_user_model()        
+        model = User        
         fields = ('username', 'email', 'password1', 'password2')
 
     def save(self, commit=True):
@@ -164,7 +178,7 @@ class LoginForm(AuthenticationForm):
     )
 
     class Meta:
-        model = get_user_model()
+        model = User
         fields = ('email', 'password')
 
     def __init__(self, *args, **kwargs):
@@ -193,7 +207,7 @@ class UpdateEmailForm(forms.ModelForm):
     field_order = ('email',)
     
     class Meta:
-        model = get_user_model()
+        model = User
         fields = ('email',)
 
     def __init__(self, *args, **kwargs):
@@ -233,7 +247,7 @@ class UpdatePasswordForm(PasswordChangeForm):
     )
 
     class Meta:
-        model = get_user_model()
+        model = User
         fields = ('old_password', 'new_password1', 'new_password2')
 
     def __init__(self, *args, **kwargs):
@@ -248,7 +262,7 @@ class ResetPasswordRequestForm(PasswordResetForm):
     ), label='Email address')
 
     class Meta:
-        model = get_user_model()
+        model = User
         fields = ('email',)
 
     def __init__(self, *args, **kwargs):
@@ -277,7 +291,7 @@ class ResetPasswordForm(SetPasswordForm):
     )
     
     class Meta:
-        model = get_user_model()
+        model = User
         fields = ('new_password1', 'new_password2')
 
     def __init__(self, *args, **kwargs):
@@ -288,7 +302,7 @@ class DeleteAccountForm(forms.ModelForm):
     Creates a delete account form. 
     """
     class Meta:
-        model = get_user_model()
+        model = User
         fields = ()
 
     def __init__(self, *args, **kwargs):

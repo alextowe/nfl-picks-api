@@ -50,6 +50,9 @@ class Profile(models.Model):
 
 
 class FriendRequest(models.Model):
-    from_user = models.ForeignKey(User, related_name='from_user', on_delete=models.CASCADE)
-    to_user = models.ForeignKey(User, related_name='to_user', on_delete=models.CASCADE)
+    from_user = models.ForeignKey(User, related_name='from_user', on_delete=models.CASCADE, null=True)
+    to_user = models.ForeignKey(User, related_name='to_user', on_delete=models.CASCADE, null=True)
     request_date = models.DateTimeField(default=datetime.now)
+    is_accepted = models.BooleanField(default=False)
+    accepted_on = models.DateTimeField(default=datetime.now)
+

@@ -30,7 +30,7 @@ urlpatterns = [
     # Base user urls
     path('profile/<slug>/', ProfileView.as_view(), name='profile'),
     path('profile/<slug>/edit/', EditProfileView.as_view(), name='edit-profile'),
-    path('<slug:from_user>/friend-request/<slug:to_user>/', FriendRequestView.as_view(), name='friend-request'),
+    path('send-friend-request/<slug>/', FriendRequestView.as_view(), name='friend-request'),
     path('friends/<slug>/', FriendsListView.as_view(), name='friends'),
 
     # User auth urls

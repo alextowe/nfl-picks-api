@@ -74,7 +74,7 @@ from .forms import (
 )
 
 # Import models 
-from .models import Profile
+from .models import Profile, FriendRequest
 User = get_user_model()
 
 # Import token generator
@@ -292,7 +292,7 @@ class EditProfileView(SuccessMessageMixin, LoginRequiredMixin, RedirectWrongUser
         username = self.kwargs['slug']
         return reverse_lazy('profile', kwargs={'slug': username})
 
-class FriendRequestView(LoginRequiredMixin, BaseUserFormView):
+class FriendRequestView(LoginRequiredMixin, CreateView, BaseUserFormView):
     """
     Renders a form to submit a friend request.
     """
@@ -300,15 +300,25 @@ class FriendRequestView(LoginRequiredMixin, BaseUserFormView):
     extra_context = {
         'title': 'Add a new friend!',
     }
+    model = FriendRequest
     success_url = 'profile'
     success_message = 'You have successfully added a new friend!'
-    
-    
+
+    def get_initial(self, *args, **kwargs):
+        """
+        """
+        from_user = User.objects.filter(username=self.request.user.username)[0]        
+        to_user = User.objects.filter(username=self.kwargs['slug'])[0]
+        initial = super(FriendRequestView, self).get_initial(**kwargs)
+        initial['from_user'] = from_user
+        initial['to_user'] = to_user 
+        print(type(from_user))
+        return initial
 
     def get_success_url(self):
         """
         """
-        username = self.kwargs['to_user']
+        username = User.objects.filter(username=self.kwargs['slug'])[0]
         return reverse_lazy(self.success_url, kwargs={'slug': username})
 
 class FriendsListView(LoginRequiredMixin, TemplateView):
