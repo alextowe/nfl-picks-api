@@ -10,7 +10,7 @@ from datetime import datetime
 class User(AbstractUser, PermissionsMixin):
     username = models.CharField(_('username'), unique=True, max_length=50)
     email = models.EmailField(_('email address'), unique=True)
-    following = models.ManyToManyField("User", blank=True)
+    friends = models.ManyToManyField("User", blank=True)
     
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
@@ -47,3 +47,9 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.user.username
+
+
+class FriendRequest(models.Model):
+    from_user = models.ForeignKey(User, related_name='from_user', on_delete=models.CASCADE)
+    to_user = models.ForeignKey(User, related_name='to_user', on_delete=models.CASCADE)
+    request_date = models.DateTimeField(default=datetime.now)

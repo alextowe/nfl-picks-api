@@ -15,6 +15,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from django.contrib import messages
+from django.http import HttpResponseRedirect
 from django.urls import (
     reverse_lazy, 
     reverse
@@ -64,6 +65,7 @@ from .forms import (
     RegisterForm, 
     LoginForm, 
     EditProfileForm,
+    FriendRequestForm,
     UpdateEmailForm, 
     UpdatePasswordForm,   
     ResetPasswordRequestForm, 
@@ -73,16 +75,18 @@ from .forms import (
 
 # Import models 
 from .models import Profile
+User = get_user_model()
 
-# Import tokens
+# Import token generator
 from .tokens import email_token_generator
+
+
 
 # Set page templates
 BASE_PAGE = 'base/pages/index.html'
 HOME_PAGE = 'base/pages/home.html'
 PROFILE_PAGE = 'base/pages/profile.html'
-ADD_FRIEND_FORM = 'base/pages/add_friend.html'
-FOLLOWING_LIST_PAGE = 'base/pages/following.html'
+FRIENDS_LIST_PAGE = 'base/pages/friends.html'
 SETTINGS_PAGE = 'base/pages/settings.html'
 FORM_PAGE = 'base/pages/form_page.html'
 ACCOUNT_VERIFICATION_EMAIL = 'base/emails/email_verification.html'
@@ -90,8 +94,7 @@ ACCOUNT_VERIFICATION_SUBJECT = 'base/emails/email_verification_subject.txt'
 RESET_PASSWORD_EMAIL = 'base/emails/reset_password.html'
 RESET_PASSWORD_SUBJECT = 'base/emails/reset_password_subject.txt'
 
-# Set user model
-User = get_user_model()
+
 
 # Custom mixins
 class RedirectLoggedInMixin(UserPassesTestMixin):
@@ -178,6 +181,7 @@ class EmailVerificationMixin(FormMixin):
         return redirect(self.success_url)   
 
 
+
 # Base views
 class BaseFormView(SuccessMessageMixin, FormView):
     """
@@ -223,7 +227,10 @@ class EmailRedirectView(RedirectView):
         
         return redirect(self.url)
 
-# Basic pages
+
+
+
+# Base pages
 class IndexView(RedirectLoggedInMixin, TemplateView):
     """
     Renders the home page.
@@ -237,6 +244,10 @@ class HomeView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
     """
     template_name = HOME_PAGE
 
+
+
+
+# Base user pages
 class ProfileView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
     """
     Renders the profile page.
@@ -250,21 +261,16 @@ class ProfileView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
         context = super(ProfileView, self).get_context_data(**kwargs)
         slug = self.kwargs['slug']
         profile = Profile.objects.filter(user__username=slug)[0]
-        user_following = self.request.user.following.values_list('username', flat=True)
-        profile_following = profile.user.following.values_list('username', flat=True)
-
-        if profile.user.username in user_following:
-            context['is_following'] = True
+        profile_friends = profile.user.friends.values_list('username', flat=True)
+        mutual_friends = self.request.user.friends.filter(username__in=profile_friends)
+        if self.request.user.username in profile_friends:
+            context['is_friend'] = True
         else:
-            context['is_following'] = False
-
-        if self.request.user.username in profile_following:
-            context['is_follower'] = True
-        else:
-            context['is_follower'] = False
+            context['is_friend'] = False
 
         context['profile'] = profile
-        return context    
+        context['mutual_friends'] = mutual_friends
+        return context  
 
 class EditProfileView(SuccessMessageMixin, LoginRequiredMixin, RedirectWrongUserMixin, UpdateView):
     """
@@ -284,27 +290,42 @@ class EditProfileView(SuccessMessageMixin, LoginRequiredMixin, RedirectWrongUser
         """
         """
         username = self.kwargs['slug']
-        return reverse_lazy('profile', kwargs={'slug': username})  
+        return reverse_lazy('profile', kwargs={'slug': username})
 
-class FollowingListView(LoginRequiredMixin, TemplateView):
+class FriendRequestView(LoginRequiredMixin, BaseUserFormView):
+    """
+    Renders a form to submit a friend request.
+    """
+    form_class = FriendRequestForm
+    extra_context = {
+        'title': 'Add a new friend!',
+    }
+    success_url = 'profile'
+    success_message = 'You have successfully added a new friend!'
+    
+    
+
+    def get_success_url(self):
+        """
+        """
+        username = self.kwargs['to_user']
+        return reverse_lazy(self.success_url, kwargs={'slug': username})
+
+class FriendsListView(LoginRequiredMixin, TemplateView):
     """
     """
-    template_name = FOLLOWING_LIST_PAGE
+    template_name = FRIENDS_LIST_PAGE
     extra_context = None
 
     def get_context_data(self, *args, **kwargs):
         """
         """
-        context = super(FollowingListView, self).get_context_data(**kwargs)
+        context = super(FriendsListView, self).get_context_data(**kwargs)
         slug = self.kwargs['slug']
-        context['user_for_following_list'] = User.objects.filter(username=slug)
+        context['user_for_friends_list'] = User.objects.filter(username=slug)
         return context
 
-class SettingsView(LoginRequiredMixin, TemplateView):
-    """
-    Renders the settings page.
-    """
-    template_name = SETTINGS_PAGE
+
 
 # User authentication views
 class RegisterView(EmailVerificationMixin, BaseAuthView, CreateView):
@@ -359,6 +380,15 @@ class LogoutView(LogoutView):
     Logs the current user out.
     """
     next_page = 'login'
+
+
+
+# User settings views
+class SettingsView(LoginRequiredMixin, TemplateView):
+    """
+    Renders the settings page.
+    """
+    template_name = SETTINGS_PAGE
 
 class UpdateEmailView(LoginRequiredMixin, EmailVerificationMixin, BaseUserFormView, UpdateView):
     """

@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% load static %}
+{% load form_tags %}
 
 {% block title %} | My Profile {% endblock%}
 
@@ -29,27 +30,25 @@
                         <a class="btn btn-dark" href="{% url 'edit-profile' user.username %}">Edit profile</a>
                     {% endif %}
                     
-                    {% if profile.user != user and not is_following %}
-                        <form method="post" action="{% url 'profile' profile.user.username %}">
-                            {% csrf_token %}
-                            <button class="btn btn-dark">Follow</button>
-                        </form>
-                    {% elif profile.user != user %}
-                    <form method="post" action="{% url 'profile' profile.user.username %}">
-                        {% csrf_token %}
-                        <button class="btn btn-dark">Unfollow</button>
-                    </form>
-                    {% endif %}
-                    {% if is_follower %}
-                        <p class="text-success">
-                            <i class="fa-solid fa-circle-check"></i>
-                            Follows you
-                        </p>
+                    {% if profile.user != user and not is_friend %}
+                        <a class="btn btn-dark" href="{% url 'friend-request' user.username profile.user.username %}">Add friend</a>
                     {% endif %}
                 </div>
                 <div class="p-3">
-                    
-                </div>                              
+                    {% if profile.user != user %}
+                        <h2 class="">Mutual friends</h2> 
+                        {% if mutual_friends %}
+                            <div class=" list-group mb-3">
+                                {% for friend in mutual_friends %}
+                                    <a href="{% url 'profile' friend.username %}" class="list-group-item">{{ friend.profile.display_name }}</a>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="">You don't have any mutual friends with {{ profile.display_name }}!</p>
+                        {% endif %}
+                        <a class="btn btn-dark"href="{% url 'friends' profile.user.username %}">View {{profile.display_name }}'s friends</a>   
+                    {% endif %}
+                </div>                                
             </div>
         </div>
     </div>

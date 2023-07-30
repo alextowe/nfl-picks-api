@@ -1,7 +1,7 @@
-from django.contrib.auth.base_user import BaseUserManager
+from django.contrib.auth.models import UserManager
 from django.utils.translation import gettext_lazy as _
 
-class UserManager(BaseUserManager):
+class UserManager(UserManager):
     """
     Custom user model manager where email is the unique identifiers
     for authentication instead of username. Still requires username.

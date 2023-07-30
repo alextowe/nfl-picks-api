@@ -19,6 +19,66 @@ from django.contrib.auth.forms import (
 
 # Import models
 from .models import Profile
+User = get_user_model()
+
+
+
+# Base user forms
+class EditProfileForm(forms.ModelForm):
+    """
+    Creates an update profile form. 
+    """
+    profile_image = forms.FileField(
+        widget=forms.ClearableFileInput(
+            attrs = {
+                'placeholder': 'Display name',
+            }
+        ), 
+        label='Profle picture',
+        required=False,
+    )
+
+    display_name = forms.CharField(
+        widget=forms.TextInput(
+            attrs = {
+                'placeholder': 'Display name',
+            }
+        ), 
+        label='Display name',
+        required=False,
+    )
+
+    biography = forms.CharField(
+        widget=forms.Textarea(
+            attrs = {
+                'placeholder': 'Enter a short bio...',
+            }
+        ), 
+        label='Biography',
+        required=False,
+    )
+    
+    field_order = ('profile_image', 'display_name', 'biography',)
+    
+    class Meta:
+        model = Profile
+        fields = ('profile_image', 'display_name','biography',)
+
+    def __init__(self, *args, **kwargs):
+        super(EditProfileForm, self).__init__(*args, **kwargs)
+
+class FriendRequestForm(forms.Form):
+    """
+    Creates a friend request form. 
+    """
+
+    class Meta:
+        model = get_user_model()
+
+    def __init__(self, *args, **kwargs):
+        super(FriendRequestForm, self).__init__(*args, **kwargs)
+
+
 
 # User authentication forms
 class RegisterForm(UserCreationForm):
@@ -111,49 +171,7 @@ class LoginForm(AuthenticationForm):
         super(LoginForm, self).__init__(*args, **kwargs)
         self.fields.pop('username')
 
-# User profile form
-class EditProfileForm(forms.ModelForm):
-    """
-    Creates an update profile form. 
-    """
-    profile_image = forms.FileField(
-        widget=forms.ClearableFileInput(
-            attrs = {
-                'placeholder': 'Display name',
-            }
-        ), 
-        label='Profle picture',
-        required=False,
-    )
 
-    display_name = forms.CharField(
-        widget=forms.TextInput(
-            attrs = {
-                'placeholder': 'Display name',
-            }
-        ), 
-        label='Display name',
-        required=False,
-    )
-
-    biography = forms.CharField(
-        widget=forms.Textarea(
-            attrs = {
-                'placeholder': 'Enter a short bio...',
-            }
-        ), 
-        label='Biography',
-        required=False,
-    )
-    
-    field_order = ('profile_image', 'display_name', 'biography',)
-    
-    class Meta:
-        model = Profile
-        fields = ('profile_image', 'display_name','biography',)
-
-    def __init__(self, *args, **kwargs):
-        super(EditProfileForm, self).__init__(*args, **kwargs)
 
 # User settings forms
 class UpdateEmailForm(forms.ModelForm):
