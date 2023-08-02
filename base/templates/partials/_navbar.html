@@ -16,6 +16,7 @@
               {% endif %}
             " alt="Profile picture" style="width:40px; height:40px;" class="rounded-circle border border-secondary">
           </a>
+          
           <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
             <li>
               <span class="dropdown-item-text">
@@ -37,7 +38,16 @@
                   <i class="fa-solid fa-user-group text-center me-3" style="width: 22px;"></i>Friends
               </a>
             </li>
-            
+            <li>
+              <a class="dropdown-item" href="{% url 'friend-requests-list' user.username %}">
+                  <i class="fa-solid fa-envelope text-center me-3" style="width: 22px;"></i>Friend requests
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="">
+                  <i class="fa-solid fa-plus text-center me-3" style="width: 22px;"></i>Add a friend
+              </a>
+            </li>
             <li>
               <a class="dropdown-item" href="{% url 'settings' %}">
                 <i class="fa-solid fa-gear text-center me-3" style="width: 22px;"></i>Settings

@@ -2,17 +2,16 @@ from django.urls import path
 from .views import (
     IndexView,
     HomeView, 
-
     ProfileView, 
     EditProfileView,
     FriendRequestView,
+    FriendRequestsListView,
+    AnswerFriendRequest,
     FriendsListView,
-
     RegisterView, 
     ActivateView,
     LoginView, 
     LogoutView, 
-    
     SettingsView, 
     UpdateEmailView, 
     VerifyEmailView,
@@ -31,7 +30,10 @@ urlpatterns = [
     path('profile/<slug>/', ProfileView.as_view(), name='profile'),
     path('profile/<slug>/edit/', EditProfileView.as_view(), name='edit-profile'),
     path('send-friend-request/<slug>/', FriendRequestView.as_view(), name='friend-request'),
+    path('friend-requests/<slug>/', FriendRequestsListView.as_view(), name='friend-requests-list'),
+    path('answer-friend-request/<slug>/', AnswerFriendRequest.as_view(), name='answer-friend-request'),
     path('friends/<slug>/', FriendsListView.as_view(), name='friends'),
+    
 
     # User auth urls
     path('register/', RegisterView.as_view(), name='register'),

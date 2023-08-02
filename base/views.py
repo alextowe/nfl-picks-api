@@ -15,6 +15,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from django.contrib import messages
+from datetime import datetime
 from django.http import HttpResponseRedirect
 from django.urls import (
     reverse_lazy, 
@@ -66,6 +67,7 @@ from .forms import (
     LoginForm, 
     EditProfileForm,
     FriendRequestForm,
+    AnswerFriendRequestForm,
     UpdateEmailForm, 
     UpdatePasswordForm,   
     ResetPasswordRequestForm, 
@@ -87,6 +89,8 @@ BASE_PAGE = 'base/pages/index.html'
 HOME_PAGE = 'base/pages/home.html'
 PROFILE_PAGE = 'base/pages/profile.html'
 FRIENDS_LIST_PAGE = 'base/pages/friends.html'
+FRIEND_REQUESTS_PAGE = 'base/pages/friend_requests.html'
+ANSWER_FRIEND_REQUEST_FORM = 'base/pages/answer_friend_request.html'
 SETTINGS_PAGE = 'base/pages/settings.html'
 FORM_PAGE = 'base/pages/form_page.html'
 ACCOUNT_VERIFICATION_EMAIL = 'base/emails/email_verification.html'
@@ -244,10 +248,6 @@ class HomeView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
     """
     template_name = HOME_PAGE
 
-
-
-
-# Base user pages
 class ProfileView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
     """
     Renders the profile page.
@@ -263,6 +263,8 @@ class ProfileView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
         profile = Profile.objects.filter(user__username=slug)[0]
         profile_friends = profile.user.friends.values_list('username', flat=True)
         mutual_friends = self.request.user.friends.filter(username__in=profile_friends)
+        friend_requests = FriendRequest.objects.filter(to_user=self.request.user, is_accepted=False)
+
         if self.request.user.username in profile_friends:
             context['is_friend'] = True
         else:
@@ -270,6 +272,7 @@ class ProfileView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
 
         context['profile'] = profile
         context['mutual_friends'] = mutual_friends
+        context['friend_requests'] = friend_requests
         return context  
 
 class EditProfileView(SuccessMessageMixin, LoginRequiredMixin, RedirectWrongUserMixin, UpdateView):
@@ -312,7 +315,6 @@ class FriendRequestView(LoginRequiredMixin, CreateView, BaseUserFormView):
         initial = super(FriendRequestView, self).get_initial(**kwargs)
         initial['from_user'] = from_user
         initial['to_user'] = to_user 
-        print(type(from_user))
         return initial
 
     def get_success_url(self):
@@ -320,6 +322,66 @@ class FriendRequestView(LoginRequiredMixin, CreateView, BaseUserFormView):
         """
         username = User.objects.filter(username=self.kwargs['slug'])[0]
         return reverse_lazy(self.success_url, kwargs={'slug': username})
+
+class FriendRequestsListView(LoginRequiredMixin, TemplateView):
+    """
+    """
+    template_name = FRIEND_REQUESTS_PAGE
+    extra_context = None
+
+    def get_context_data(self, *args, **kwargs):
+        """
+        """
+        context = super(FriendRequestsListView, self).get_context_data(**kwargs)
+        user = User.objects.filter(username=self.kwargs['slug'])[0]
+        context['friend_requests'] = FriendRequest.objects.filter(to_user=user, is_accepted=False, is_declined=False)
+        return context
+
+class AnswerFriendRequest(LoginRequiredMixin, BaseUserFormView):
+    """
+    """
+    template_name = ANSWER_FRIEND_REQUEST_FORM
+    form_class = AnswerFriendRequestForm
+    success_url = 'friend-requests-list'
+    extra_context = None
+
+    def get_context_data(self, *args, **kwargs):
+        """
+        """
+        context = super(AnswerFriendRequest, self).get_context_data(**kwargs)
+        from_user = User.objects.filter(username=self.kwargs['slug'])[0]
+        to_user = self.request.user
+        context['friend_request'] = FriendRequest.objects.filter(from_user=from_user, to_user=to_user, is_accepted=False)[0]
+        return context
+
+    def get_success_url(self):
+        """
+        """
+        username = self.request.user
+        return reverse_lazy(self.success_url, kwargs={'slug': username})
+
+    def post(self, request, *args, **kwargs):
+        """
+        """
+        from_user = User.objects.filter(username=self.kwargs['slug'])[0]
+        to_user = self.request.user
+        friend_request = FriendRequest.objects.filter(from_user=from_user, to_user=to_user, is_accepted=False)[0]
+        if 'accept-request' in request.POST:
+            from_user.friends.add(to_user)
+            to_user.friends.add(from_user)
+            friend_request.is_accepted = True
+            friend_request.is_declined = False
+            friend_request.accepted_on = datetime.now()
+            from_user.save()
+            to_user.save()
+            friend_request.save()
+        elif'decline-request' in request.POST:
+            friend_request.is_accepted = False
+            friend_request.is_declined = True
+            friend_request.declined_on = datetime.now()
+            friend_request.save()
+
+        return HttpResponseRedirect(self.get_success_url())
 
 class FriendsListView(LoginRequiredMixin, TemplateView):
     """
@@ -331,8 +393,8 @@ class FriendsListView(LoginRequiredMixin, TemplateView):
         """
         """
         context = super(FriendsListView, self).get_context_data(**kwargs)
-        slug = self.kwargs['slug']
-        context['user_for_friends_list'] = User.objects.filter(username=slug)
+        user = User.objects.filter(username=self.kwargs['slug'])[0]
+        context['user_for_friends_list'] = User.objects.filter(username=user.username)
         return context
 
 

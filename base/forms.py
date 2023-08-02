@@ -92,6 +92,22 @@ class FriendRequestForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(FriendRequestForm, self).__init__(*args, **kwargs)
 
+class AnswerFriendRequestForm(forms.ModelForm):
+    """
+    Creates a form to accept or deny a friend request. 
+    """
+
+    class Meta:
+        model = FriendRequest
+        exclude = ('request_date', 'is_accepted', 'accepted_on')
+        widgets = {
+            'from_user': forms.HiddenInput(),
+            'to_user': forms.HiddenInput(),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(AnswerFriendRequestForm, self).__init__(*args, **kwargs)
+
 
 
 # User authentication forms
