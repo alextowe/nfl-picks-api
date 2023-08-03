@@ -109,6 +109,9 @@ class RedirectLoggedInMixin(UserPassesTestMixin):
     redirect_url = None
 
     def get_redirect_url(self):
+        """
+        Gets the redirect url defined by 'redirect_url'.
+        """
         redirect_url = self.redirect_url
         if not redirect_url:
             raise ImproperlyConfigured(
@@ -121,6 +124,9 @@ class RedirectLoggedInMixin(UserPassesTestMixin):
         return redirect(self.get_redirect_url())
 
     def test_func(self):
+        """
+        Tests whether a user is currenly logged in. Returns the opposite boolean value of the outcome of the test.
+        """
         return not self.request.user.is_authenticated
 
 class RedirectWrongUserMixin(UserPassesTestMixin):
@@ -130,6 +136,9 @@ class RedirectWrongUserMixin(UserPassesTestMixin):
     redirect_url = None
 
     def get_redirect_url(self):
+        """
+        Gets the redirect url defined by 'redirect_url'.
+        """
         redirect_url = self.redirect_url
         if not redirect_url:
             raise ImproperlyConfigured(
@@ -139,9 +148,15 @@ class RedirectWrongUserMixin(UserPassesTestMixin):
         return str(redirect_url)
 
     def handle_no_permission(self):
+        """
+        Redirects the user to the given redirect url if they don't have permission.
+        """
         return redirect(self.get_redirect_url())
 
     def test_func(self):
+        """
+        Tests currenly logged in user's username against the username found in the url for an edit page.
+        """
         authorized = False
         if self.request.user.username == self.kwargs['slug']:
             authorized = True
@@ -326,6 +341,7 @@ class FriendRequestView(LoginRequiredMixin, CreateView, BaseUserFormView):
 
 class FriendRequestsListView(LoginRequiredMixin, TemplateView):
     """
+    Renders a list of friend requests both sent and received.
     """
     template_name = FRIEND_REQUESTS_PAGE
     extra_context = None
@@ -351,6 +367,7 @@ class FriendRequestsListView(LoginRequiredMixin, TemplateView):
 
 class AnswerFriendRequest(LoginRequiredMixin, BaseUserFormView):
     """
+    Renders a form to accept or decline a received friend request.
     """
     template_name = ANSWER_FRIEND_REQUEST_FORM
     form_class = AnswerFriendRequestForm
@@ -405,6 +422,7 @@ class AnswerFriendRequest(LoginRequiredMixin, BaseUserFormView):
 
 class CancelFriendRequest(LoginRequiredMixin, BaseUserFormView):
     """
+    Renders a form to cancel a sent friend request.
     """
     form_class = CancelFriendRequestForm
     success_url = 'friend-requests-list'
@@ -449,6 +467,7 @@ class CancelFriendRequest(LoginRequiredMixin, BaseUserFormView):
 
 class FriendsListView(LoginRequiredMixin, TemplateView):
     """
+    Renders a list of friends for the currently logged in user.
     """
     template_name = FRIENDS_LIST_PAGE
     extra_context = None
