@@ -19,9 +19,9 @@ class ProfileAdmin(admin.ModelAdmin):
 admin.site.register(Profile, ProfileAdmin)
 
 class FriendRequestAdmin(admin.ModelAdmin):
-    list_display = ('from_user', 'to_user', 'request_date', 'is_accepted', 'accepted_on')
-    list_display_links = ('from_user', 'to_user', 'request_date', 'is_accepted', 'accepted_on')
-    search_field = ('from_user', 'to_user','request_date', 'is_accepted', 'accepted_on')
+    list_display = ('from_user', 'to_user', 'request_date', 'is_accepted', 'is_declined', 'is_canceled')
+    list_display_links = ('from_user', 'to_user', 'request_date', 'is_accepted', 'is_declined', 'is_canceled')
+    search_field = ('from_user', 'to_user','request_date', 'is_accepted', 'accepted_on', 'is_declined', 'is_canceled')
     list_per_page = 25
 
 admin.site.register(FriendRequest, FriendRequestAdmin)

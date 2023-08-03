@@ -83,7 +83,7 @@ class FriendRequestForm(forms.ModelForm):
 
     class Meta:
         model = FriendRequest
-        exclude = ('request_date', 'is_accepted', 'accepted_on')
+        exclude = ('request_date', 'is_accepted', 'accepted_on', 'is_declined', 'declined_on', 'is_canceled', 'canceled_on')
         widgets = {
             'from_user': forms.HiddenInput(),
             'to_user': forms.HiddenInput(),
@@ -99,7 +99,7 @@ class AnswerFriendRequestForm(forms.ModelForm):
 
     class Meta:
         model = FriendRequest
-        exclude = ('request_date', 'is_accepted', 'accepted_on')
+        exclude = ('request_date', 'is_accepted', 'accepted_on', 'is_declined', 'declined_on', 'is_canceled', 'canceled_on')
         widgets = {
             'from_user': forms.HiddenInput(),
             'to_user': forms.HiddenInput(),
@@ -107,6 +107,22 @@ class AnswerFriendRequestForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(AnswerFriendRequestForm, self).__init__(*args, **kwargs)
+
+class CancelFriendRequestForm(forms.ModelForm):
+    """
+    Creates a form to cancel a sent friend request. 
+    """
+
+    class Meta:
+        model = FriendRequest
+        exclude = ('request_date', 'is_accepted', 'accepted_on', 'is_declined', 'declined_on', 'is_canceled', 'canceled_on')
+        widgets = {
+            'from_user': forms.HiddenInput(),
+            'to_user': forms.HiddenInput(),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(CancelFriendRequestForm, self).__init__(*args, **kwargs)
 
 
 

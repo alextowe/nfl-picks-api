@@ -7,6 +7,7 @@ from .views import (
     FriendRequestView,
     FriendRequestsListView,
     AnswerFriendRequest,
+    CancelFriendRequest,
     FriendsListView,
     RegisterView, 
     ActivateView,
@@ -32,6 +33,7 @@ urlpatterns = [
     path('send-friend-request/<slug>/', FriendRequestView.as_view(), name='friend-request'),
     path('friend-requests/<slug>/', FriendRequestsListView.as_view(), name='friend-requests-list'),
     path('answer-friend-request/<slug>/', AnswerFriendRequest.as_view(), name='answer-friend-request'),
+    path('cancel-friend-request/<slug>/', CancelFriendRequest.as_view(), name='cancel-friend-request'),
     path('friends/<slug>/', FriendsListView.as_view(), name='friends'),
     
 

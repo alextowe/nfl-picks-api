@@ -9,20 +9,47 @@
         <div class="row">
             <div class="col-lg-8 offset-lg-2">
                 {% include 'partials/_alerts.html' %}
-                <h1 class="border-3 border-bottom border-dark pb-3">Your Friend Requests</h1>
-                {% if friend_requests %}
-                    {% for request in friend_requests %}
-                        <div class="text-center mt-5 p-3 border-2 border border-dark">
-                            <p class="fs-3">
-                                <a href="{% url 'profile' request.from_user %}">{{ request.from_user.profile.display_name }}</a> wants to be your friend!
-                            </p>
-                            <p class="fs-4">A new friend request was sent to you {{ request.request_date | timesince }} ago</p>
-                            <a href="{% url 'answer-friend-request' request.from_user %}" class=" btn btn-dark">Respond</a>
-                        </div>
-                    {% endfor %}    
-                {% else %}
-                        <p class="fs-4 mt-4">You don't have any pending friend requests!</p>
-                {% endif %}              
+                <h1 class="border-3 border-bottom border-dark pb-3">Friend Requests</h1>
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="friend-requests-tab" data-bs-toggle="tab" data-bs-target="#friend-requests-tab-pane" type="button" role="tab" aria-controls="friend-requests-tab-pane" aria-selected="true">My Friend Requests</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="sent-friend-requests-tab" data-bs-toggle="tab" data-bs-target="#sent-friend-requests-tab-pane" type="button" role="tab" aria-controls="sent-friend-requests-tab-pane" aria-selected="false">Sent Friend Requests</button>
+                    </li>
+                </ul>
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active" id="friend-requests-tab-pane" role="tabpanel" aria-labelledby="friend-requests-tab" tabindex="0">
+                        {% if friend_requests %}
+                            {% for request in friend_requests %}
+                                <div class="tab-pane text-center mt-5 p-3 border-2 border border-dark">
+                                <p class="fs-3">
+                                    <a href="{% url 'profile' request.from_user %}">{{ request.from_user.profile.display_name }}</a> wants to be your friend!
+                                </p>
+                                <p class="fs-4">A new friend request was sent to you {{ request.request_date | timesince }} ago</p>
+                                    <a href="{% url 'answer-friend-request' request.from_user %}" class=" btn btn-dark">Respond</a>
+                                </div>
+                            {% endfor %}    
+                        {% else %}
+                            <p class="fs-4 mt-4">You don't have any pending friend requests!</p>
+                        {% endif %}
+                    </div>
+                    <div class="tab-pane fade" id="sent-friend-requests-tab-pane" role="tabpanel" aria-labelledby="sent-friend-requests-tab" tabindex="0">
+                        {% if sent_friend_requests %}
+                            {% for request in sent_friend_requests %}
+                                <div class="tab-pane text-center mt-5 p-3 border-2 border border-dark">
+                                <p class="fs-3">
+                                    <a href="{% url 'profile' request.from_user %}">{{ request.to_user.profile.display_name }}</a> hasn't answered your friend request!
+                                </p>
+                                <p class="fs-4">You sent a friend request {{ request.request_date | timesince }} ago</p>
+                                    <a href="{% url 'cancel-friend-request' request.from_user %}" class=" btn btn-dark">Cancel</a>
+                                </div>
+                            {% endfor %}    
+                        {% else %}
+                            <p class="fs-4 mt-4">You haven't sent any friend requests!</p>
+                        {% endif %}
+                    </div>
+                </div>              
             </div>
         </div>
     </div>

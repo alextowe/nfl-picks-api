@@ -68,6 +68,7 @@ from .forms import (
     EditProfileForm,
     FriendRequestForm,
     AnswerFriendRequestForm,
+    CancelFriendRequestForm,
     UpdateEmailForm, 
     UpdatePasswordForm,   
     ResetPasswordRequestForm, 
@@ -305,7 +306,7 @@ class FriendRequestView(LoginRequiredMixin, CreateView, BaseUserFormView):
     }
     model = FriendRequest
     success_url = 'profile'
-    success_message = 'You have successfully added a new friend!'
+    success_message = 'You sent a friend request!'
 
     def get_initial(self, *args, **kwargs):
         """
@@ -334,7 +335,18 @@ class FriendRequestsListView(LoginRequiredMixin, TemplateView):
         """
         context = super(FriendRequestsListView, self).get_context_data(**kwargs)
         user = User.objects.filter(username=self.kwargs['slug'])[0]
-        context['friend_requests'] = FriendRequest.objects.filter(to_user=user, is_accepted=False, is_declined=False)
+        context['friend_requests'] = FriendRequest.objects.filter(
+            to_user=user, 
+            is_accepted=False, 
+            is_declined=False, 
+            is_canceled=False
+        )
+        context['sent_friend_requests'] = FriendRequest.objects.filter(
+            from_user=user, 
+            is_accepted=False, 
+            is_declined=False, 
+            is_canceled=False
+        )
         return context
 
 class AnswerFriendRequest(LoginRequiredMixin, BaseUserFormView):
@@ -351,7 +363,11 @@ class AnswerFriendRequest(LoginRequiredMixin, BaseUserFormView):
         context = super(AnswerFriendRequest, self).get_context_data(**kwargs)
         from_user = User.objects.filter(username=self.kwargs['slug'])[0]
         to_user = self.request.user
-        context['friend_request'] = FriendRequest.objects.filter(from_user=from_user, to_user=to_user, is_accepted=False)[0]
+        context['friend_request'] = FriendRequest.objects.filter(
+            from_user=from_user, 
+            to_user=to_user, 
+            is_accepted=False
+        )[0]
         return context
 
     def get_success_url(self):
@@ -365,7 +381,11 @@ class AnswerFriendRequest(LoginRequiredMixin, BaseUserFormView):
         """
         from_user = User.objects.filter(username=self.kwargs['slug'])[0]
         to_user = self.request.user
-        friend_request = FriendRequest.objects.filter(from_user=from_user, to_user=to_user, is_accepted=False)[0]
+        friend_request = FriendRequest.objects.filter(
+            from_user=from_user, 
+            to_user=to_user, 
+            is_accepted=False
+        )[0]
         if 'accept-request' in request.POST:
             from_user.friends.add(to_user)
             to_user.friends.add(from_user)
@@ -381,6 +401,50 @@ class AnswerFriendRequest(LoginRequiredMixin, BaseUserFormView):
             friend_request.declined_on = datetime.now()
             friend_request.save()
 
+        return HttpResponseRedirect(self.get_success_url())
+
+class CancelFriendRequest(LoginRequiredMixin, BaseUserFormView):
+    """
+    """
+    form_class = CancelFriendRequestForm
+    success_url = 'friend-requests-list'
+    extra_context = {
+        'title': 'Cancel friend request',
+    }
+
+    def get_context_data(self, *args, **kwargs):
+        """
+        """
+        context = super(CancelFriendRequest, self).get_context_data(**kwargs)
+        from_user = User.objects.filter(username=self.kwargs['slug'])[0]
+        to_user = self.request.user
+        context['friend_request'] = FriendRequest.objects.filter(
+            from_user=from_user, 
+            to_user=to_user, 
+            is_accepted=False, 
+            is_declined=False, 
+            is_canceled=False
+        )
+        return context
+
+    def get_success_url(self):
+        """
+        """
+        username = self.request.user
+        return reverse_lazy(self.success_url, kwargs={'slug': username})
+    
+    def post(self, request, *args, **kwargs):
+        """
+        """
+        from_user = self.request.user
+        friend_request = FriendRequest.objects.filter(
+            from_user=from_user, 
+            is_accepted=False, 
+            is_declined=False, 
+            is_canceled=False
+        )[0]
+        friend_request.is_canceled = True
+        friend_request.save()
         return HttpResponseRedirect(self.get_success_url())
 
 class FriendsListView(LoginRequiredMixin, TemplateView):
