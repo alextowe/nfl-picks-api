@@ -14,6 +14,7 @@ from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
+from django.db.models import Q
 from django.contrib import messages
 from datetime import datetime
 from django.http import HttpResponseRedirect
@@ -69,6 +70,7 @@ from .forms import (
     FriendRequestForm,
     AnswerFriendRequestForm,
     CancelFriendRequestForm,
+    SearchForUserForm,
     UpdateEmailForm, 
     UpdatePasswordForm,   
     ResetPasswordRequestForm, 
@@ -92,8 +94,10 @@ PROFILE_PAGE = 'base/pages/profile.html'
 FRIENDS_LIST_PAGE = 'base/pages/friends.html'
 FRIEND_REQUESTS_PAGE = 'base/pages/friend_requests.html'
 ANSWER_FRIEND_REQUEST_FORM = 'base/pages/answer_friend_request.html'
+SEARCH_RESULTS_PAGE = 'base/pages/search_results.html'
 SETTINGS_PAGE = 'base/pages/settings.html'
-FORM_PAGE = 'base/pages/form_page.html'
+FORM_PAGE_POST = 'base/pages/form_page_post.html'
+FORM_PAGE_GET = 'base/pages/form_page_get.html'
 ACCOUNT_VERIFICATION_EMAIL = 'base/emails/email_verification.html'
 ACCOUNT_VERIFICATION_SUBJECT = 'base/emails/email_verification_subject.txt'
 RESET_PASSWORD_EMAIL = 'base/emails/reset_password.html'
@@ -207,7 +211,7 @@ class BaseFormView(SuccessMessageMixin, FormView):
     """
     Base form view.
     """
-    template_name = FORM_PAGE
+    template_name = FORM_PAGE_POST
 
 
 class BaseUserFormView(BaseFormView):
@@ -279,23 +283,34 @@ class ProfileView(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
         profile = Profile.objects.filter(user__username=slug)[0]
         profile_friends = profile.user.friends.values_list('username', flat=True)
         mutual_friends = self.request.user.friends.filter(username__in=profile_friends)
-        friend_requests = FriendRequest.objects.filter(to_user=self.request.user, is_accepted=False)
+        friend_request_sent = FriendRequest.objects.filter(
+            from_user=self.request.user,
+            to_user=profile.user, 
+            is_accepted=False, 
+            is_declined=False, 
+            was_canceled=False
+        )
 
         if self.request.user.username in profile_friends:
             context['is_friend'] = True
         else:
             context['is_friend'] = False
+        
+        if friend_request_sent:
+            context['friend_request_sent'] = True
+        else:
+            context['friend_request_sent'] = False
 
         context['profile'] = profile
         context['mutual_friends'] = mutual_friends
-        context['friend_requests'] = friend_requests
+        
         return context  
 
 class EditProfileView(SuccessMessageMixin, LoginRequiredMixin, RedirectWrongUserMixin, UpdateView):
     """
     Renders the edit  profile form.
     """
-    template_name = FORM_PAGE
+    template_name = FORM_PAGE_POST
     form_class = EditProfileForm 
     model = Profile
     slug_field = 'user__username' 
@@ -321,7 +336,7 @@ class FriendRequestView(LoginRequiredMixin, CreateView, BaseUserFormView):
     }
     model = FriendRequest
     success_url = 'profile'
-    success_message = 'You sent a friend request!'
+    success_message = 'You added a new friend!'
 
     def get_initial(self, *args, **kwargs):
         """
@@ -355,17 +370,17 @@ class FriendRequestsListView(LoginRequiredMixin, TemplateView):
             to_user=user, 
             is_accepted=False, 
             is_declined=False, 
-            is_canceled=False
+            was_canceled=False
         )
         context['sent_friend_requests'] = FriendRequest.objects.filter(
             from_user=user, 
             is_accepted=False, 
             is_declined=False, 
-            is_canceled=False
+            was_canceled=False
         )
         return context
 
-class AnswerFriendRequest(LoginRequiredMixin, BaseUserFormView):
+class AnswerFriendRequestView(LoginRequiredMixin, BaseUserFormView):
     """
     Renders a form to accept or decline a received friend request.
     """
@@ -377,7 +392,7 @@ class AnswerFriendRequest(LoginRequiredMixin, BaseUserFormView):
     def get_context_data(self, *args, **kwargs):
         """
         """
-        context = super(AnswerFriendRequest, self).get_context_data(**kwargs)
+        context = super(AnswerFriendRequestView, self).get_context_data(**kwargs)
         from_user = User.objects.filter(username=self.kwargs['slug'])[0]
         to_user = self.request.user
         context['friend_request'] = FriendRequest.objects.filter(
@@ -420,7 +435,7 @@ class AnswerFriendRequest(LoginRequiredMixin, BaseUserFormView):
 
         return HttpResponseRedirect(self.get_success_url())
 
-class CancelFriendRequest(LoginRequiredMixin, BaseUserFormView):
+class CancelFriendRequestView(LoginRequiredMixin, BaseUserFormView):
     """
     Renders a form to cancel a sent friend request.
     """
@@ -433,7 +448,7 @@ class CancelFriendRequest(LoginRequiredMixin, BaseUserFormView):
     def get_context_data(self, *args, **kwargs):
         """
         """
-        context = super(CancelFriendRequest, self).get_context_data(**kwargs)
+        context = super(CancelFriendRequestView, self).get_context_data(**kwargs)
         from_user = User.objects.filter(username=self.kwargs['slug'])[0]
         to_user = self.request.user
         context['friend_request'] = FriendRequest.objects.filter(
@@ -441,7 +456,7 @@ class CancelFriendRequest(LoginRequiredMixin, BaseUserFormView):
             to_user=to_user, 
             is_accepted=False, 
             is_declined=False, 
-            is_canceled=False
+            was_canceled=False
         )
         return context
 
@@ -459,9 +474,9 @@ class CancelFriendRequest(LoginRequiredMixin, BaseUserFormView):
             from_user=from_user, 
             is_accepted=False, 
             is_declined=False, 
-            is_canceled=False
+            was_canceled=False
         )[0]
-        friend_request.is_canceled = True
+        friend_request.was_canceled = True
         friend_request.save()
         return HttpResponseRedirect(self.get_success_url())
 
@@ -479,6 +494,31 @@ class FriendsListView(LoginRequiredMixin, TemplateView):
         user = User.objects.filter(username=self.kwargs['slug'])[0]
         context['user_for_friends_list'] = User.objects.filter(username=user.username)
         return context
+
+class SearchForUserView(LoginRequiredMixin, BaseUserFormView):
+    """
+    Renders a form to search for other users.
+    """
+    form_class = SearchForUserForm
+    template_name = FORM_PAGE_GET
+    extra_context = {
+        'title': 'Search for other users',
+    }    
+
+class SearchForUserResultsView(LoginRequiredMixin, ListView):
+    """
+    Renders a page displaying the searched user.
+    """
+    template_name = SEARCH_RESULTS_PAGE
+    model = User
+    extra_context = {
+        'title': 'User was found!',
+    }
+
+    def get_queryset(self):
+        query = self.request.GET.get('search')
+        object_list = User.objects.filter(Q(username__iexact=query))
+        return object_list
 
 
 

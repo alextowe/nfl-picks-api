@@ -30,7 +30,15 @@
                         <a class="btn btn-dark" href="{% url 'edit-profile' user.username %}">Edit profile</a>
                     {% endif %}
                     {% if profile.user != user and not is_friend %}
-                        <a class="btn btn-dark" href="{% url 'friend-request' profile.user.username %}">Add friend</a>
+                        {% if friend_request_sent  %}
+                            <p class="text-success">
+                                <i class="fa-solid fa-circle-check"></i>
+                                Friend Request Sent!
+                            </p>
+                            <a href="{% url 'cancel-friend-request' profile.user.username %}" class=" btn btn-dark">Cancel Friend Request</a>
+                        {% else %}
+                            <a class="btn btn-dark" href="{% url 'friend-request' profile.user.username %}">Add friend</a>
+                        {% endif %}
                     {% endif %}
                 </div>
                 <div class="p-3">

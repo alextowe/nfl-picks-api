@@ -57,6 +57,6 @@ class FriendRequest(models.Model):
     accepted_on = models.DateTimeField(default=datetime.now)
     is_declined = models.BooleanField(default=False)
     declined_on = models.DateTimeField(default=datetime.now)
-    is_canceled = models.BooleanField(default=False)
+    was_canceled = models.BooleanField(default=False)
     canceled_on = models.DateTimeField(default=datetime.now)
 

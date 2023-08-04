@@ -6,9 +6,11 @@ from .views import (
     EditProfileView,
     FriendRequestView,
     FriendRequestsListView,
-    AnswerFriendRequest,
-    CancelFriendRequest,
+    AnswerFriendRequestView,
+    CancelFriendRequestView,
     FriendsListView,
+    SearchForUserView,
+    SearchForUserResultsView,
     RegisterView, 
     ActivateView,
     LoginView, 
@@ -32,9 +34,11 @@ urlpatterns = [
     path('profile/<slug>/edit/', EditProfileView.as_view(), name='edit-profile'),
     path('send-friend-request/<slug>/', FriendRequestView.as_view(), name='friend-request'),
     path('friend-requests/<slug>/', FriendRequestsListView.as_view(), name='friend-requests-list'),
-    path('answer-friend-request/<slug>/', AnswerFriendRequest.as_view(), name='answer-friend-request'),
-    path('cancel-friend-request/<slug>/', CancelFriendRequest.as_view(), name='cancel-friend-request'),
+    path('answer-friend-request/<slug>/', AnswerFriendRequestView.as_view(), name='answer-friend-request'),
+    path('cancel-friend-request/<slug>/', CancelFriendRequestView.as_view(), name='cancel-friend-request'),
     path('friends/<slug>/', FriendsListView.as_view(), name='friends'),
+    path('search/', SearchForUserView.as_view(), name='search-users'),
+    path('add-friend/', SearchForUserResultsView.as_view(), name='add-friend'),
     
 
     # User auth urls

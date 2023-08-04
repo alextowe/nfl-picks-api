@@ -83,7 +83,7 @@ class FriendRequestForm(forms.ModelForm):
 
     class Meta:
         model = FriendRequest
-        exclude = ('request_date', 'is_accepted', 'accepted_on', 'is_declined', 'declined_on', 'is_canceled', 'canceled_on')
+        exclude = ('request_date', 'is_accepted', 'accepted_on', 'is_declined', 'declined_on', 'was_canceled', 'canceled_on')
         widgets = {
             'from_user': forms.HiddenInput(),
             'to_user': forms.HiddenInput(),
@@ -99,7 +99,7 @@ class AnswerFriendRequestForm(forms.ModelForm):
 
     class Meta:
         model = FriendRequest
-        exclude = ('request_date', 'is_accepted', 'accepted_on', 'is_declined', 'declined_on', 'is_canceled', 'canceled_on')
+        exclude = ('request_date', 'is_accepted', 'accepted_on', 'is_declined', 'declined_on', 'was_canceled', 'canceled_on')
         widgets = {
             'from_user': forms.HiddenInput(),
             'to_user': forms.HiddenInput(),
@@ -115,7 +115,7 @@ class CancelFriendRequestForm(forms.ModelForm):
 
     class Meta:
         model = FriendRequest
-        exclude = ('request_date', 'is_accepted', 'accepted_on', 'is_declined', 'declined_on', 'is_canceled', 'canceled_on')
+        exclude = ('request_date', 'is_accepted', 'accepted_on', 'is_declined', 'declined_on', 'was_canceled', 'canceled_on')
         widgets = {
             'from_user': forms.HiddenInput(),
             'to_user': forms.HiddenInput(),
@@ -124,6 +124,29 @@ class CancelFriendRequestForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(CancelFriendRequestForm, self).__init__(*args, **kwargs)
 
+class SearchForUserForm(forms.ModelForm):
+    """
+    Creates a form to search for other users. 
+    """
+    search = forms.CharField(
+        widget=forms.TextInput(
+            attrs = {
+                'placeholder': 'Username',
+            }
+        ), 
+        label='Username',
+        error_messages = {
+            'required': _('Username is required!'),
+            'invalid': _('Invalid Username'),
+        }
+    )
+
+    class Meta:
+        model = User
+        fields = ('search',)
+
+    def __init__(self, *args, **kwargs):
+        super(SearchForUserForm, self).__init__(*args, **kwargs)
 
 
 # User authentication forms
