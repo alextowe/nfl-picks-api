@@ -1,7 +1,8 @@
 from django.contrib.auth.models import UserManager
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-class UserManager(UserManager):
+class NewUserManager(UserManager):
     """
     Custom user model manager where email is the unique identifiers
     for authentication instead of username. Still requires username.
@@ -32,3 +33,4 @@ class UserManager(UserManager):
         if extra_fields.get("is_superuser") is not True:
             raise ValueError(_("Superuser must have is_superuser=True."))
         return self.create_user(email, password, **extra_fields)
+
