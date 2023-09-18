@@ -1,36 +1,23 @@
 from django.contrib.auth.models import UserManager
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 
-class NewUserManager(UserManager):
+
+class UserManager(UserManager):
     """
-    Custom user model manager where email is the unique identifiers
-    for authentication instead of username. Still requires username.
+    Manager functions for the User model.
     """
-    def create_user(self, email, password, **extra_fields):
-        """
-        Create and save a user with the given username, email and password.
-        """
-        if not email:
-            raise ValueError(_("The Email must be set"))
-        
-        email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
-        user.set_password(password)
-        user.save()
-        return user
 
-    def create_superuser(self, email, password, **extra_fields):
+    def get_following(self):
         """
-        Create and save a SuperUser with the given email and password.
+        Returns the 'following' field for a user instance.
         """
-        extra_fields.setdefault("is_staff", True)
-        extra_fields.setdefault("is_superuser", True)
-        extra_fields.setdefault("is_active", True)
+        return self.following.all()
+    
+    def get_followers(self):
+        """
+        Returns a list of followers for a user instance.
+        """
+        return self.followers.all()
 
-        if extra_fields.get("is_staff") is not True:
-            raise ValueError(_("Superuser must have is_staff=True."))
-        if extra_fields.get("is_superuser") is not True:
-            raise ValueError(_("Superuser must have is_superuser=True."))
-        return self.create_user(email, password, **extra_fields)
+   
 
