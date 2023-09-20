@@ -17,3 +17,11 @@ class User(AbstractUser, PermissionsMixin):
 
     def __str__(self):
         return self.username
+
+class MatchUp(models.Model):
+    name = models.CharField(max_length=50)
+    short_name = models.CharField(max_length=50)
+    week = models.IntegerField()
+    year = models.IntegerField()
+    home_team = models.CharField(max_length=50)
+    away_team = models.CharField(max_length=50)
