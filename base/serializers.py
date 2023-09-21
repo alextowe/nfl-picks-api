@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import MatchUp
+from .models import Matchup
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
@@ -9,6 +9,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         model = User
         fields = [
             'url', 
+            'id',
             'username', 
             'email', 
             'following',
@@ -18,9 +19,11 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
 class MatchUpSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = MatchUp
+        model = Matchup
         fields = [
             'url', 
+            'id',
+            'uid',
             'name', 
             'short_name', 
             'week',
