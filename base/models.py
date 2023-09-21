@@ -26,6 +26,8 @@ class Matchup(models.Model):
     year = models.IntegerField()
     home_team = models.CharField(max_length=50)
     away_team = models.CharField(max_length=50)
+    home_score = models.IntegerField(default=0)
+    away_score = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.name
+        return self.short_name

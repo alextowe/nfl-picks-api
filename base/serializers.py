@@ -29,5 +29,7 @@ class MatchUpSerializer(serializers.HyperlinkedModelSerializer):
             'week',
             'year',
             'home_team',
-            'away_team'
+            'away_team',
+            'home_score',
+            'away_score'
         ]
