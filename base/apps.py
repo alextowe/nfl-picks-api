@@ -7,4 +7,4 @@ class BaseConfig(AppConfig):
     
     def ready(self):
         from . import updater
-        updater.start()
+        updater.start_schedules()

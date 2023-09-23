@@ -14,9 +14,9 @@ class UserAdmin(admin.ModelAdmin):
 admin.site.register(User, UserAdmin)
 
 class MatchupAdmin(admin.ModelAdmin):
-    list_display = ('id', 'short_name', 'week', 'year', 'away_score', 'home_score')
-    list_display_links = ('id', 'short_name', 'week', 'year','away_score', 'home_score')
-    search_field = ('id', 'short_name', 'week', 'year')
+    list_display = ('id', 'short_name', 'week', 'year', 'away_score', 'home_score', 'completed')
+    list_display_links = ('id', 'short_name', 'week', 'year','away_score', 'home_score', 'completed')
+    search_field = ('id', 'short_name', 'week', 'year', 'completed')
     list_per_page = 25
 
 admin.site.register(Matchup, MatchupAdmin)

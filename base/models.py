@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 from .managers import UserManager
+from datetime import datetime
 
 
 class User(AbstractUser, PermissionsMixin):
@@ -26,8 +27,10 @@ class Matchup(models.Model):
     year = models.IntegerField()
     home_team = models.CharField(max_length=50)
     away_team = models.CharField(max_length=50)
-    home_score = models.IntegerField(default=0)
-    away_score = models.IntegerField(default=0)
+    home_score = models.IntegerField()
+    away_score = models.IntegerField()
+    date = models.DateTimeField(default=datetime.now)
+    completed = models.BooleanField(default=False)
 
     def __str__(self):
         return self.short_name
