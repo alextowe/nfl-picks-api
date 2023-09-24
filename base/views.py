@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from base.permissions import IsOwner, IsOwnerOrReadOnly
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view
 from rest_framework import views, generics, mixins, reverse, permissions, status
 from base.serializers import UserSerializer, MatchupSerializer, PickGroupSerializer
@@ -21,6 +22,7 @@ def api_root(request, format=None):
 class UserListView(generics.ListCreateAPIView):
     queryset = User.objects.all().order_by('id')
     serializer_class = UserSerializer
+    permission_classes = [AllowAny]
 
 class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all().order_by('id')
