@@ -17,7 +17,7 @@ def set_matchup_schedules():
             'interval',
             start_date=earliest_matchup,
             end_date=latest_matchup + timedelta(hours=5),
-            minutes=1
+            minutes=3
         )
 
     for t in scheduler.get_jobs():

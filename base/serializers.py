@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
 from .models import Matchup, PickGroup
 from django.contrib.auth import get_user_model
@@ -18,21 +19,22 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             'description',
             'profile_image'
         ]
-        extra_kwargs = {
-            'password': {'write_only': True},
-        }
 
-        def validate_password(self, value):
-            validate_password(value)
-            return value
+    extra_kwargs = {
+        'password': {'write_only': True},
+    }
 
-        def create(self, validated_data):
-            user = get_user_model()(**validated_data)
+    def validate_password(self, value):
+        validate_password(value)
+        return value
 
-            user.set_password(validated_data['password'])
-            user.save()
+    def create(self, validated_data):
+        user = get_user_model()(**validated_data)
 
-            return user
+        user.set_password(validated_data['password'])
+        user.save()
+
+        return user
 
 class MatchupSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
