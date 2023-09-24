@@ -1,8 +1,7 @@
-from django.shortcuts import render
 from base.permissions import IsOwner, IsOwnerOrReadOnly
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view
-from rest_framework import views, generics, mixins, reverse, permissions, status
+from rest_framework import generics, reverse
 from base.serializers import UserSerializer, MatchupSerializer, PickGroupSerializer
 from rest_framework.response import Response
 from rest_framework.reverse import reverse

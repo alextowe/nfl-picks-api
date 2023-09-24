@@ -29,7 +29,6 @@ def get_matchups():
                 )
                 matchup.save()           
 
-
 def update_score():
     date = datetime.now().strftime('%Y%m%d')
     url = f'https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates={date}'
