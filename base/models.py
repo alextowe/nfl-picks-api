@@ -34,4 +34,12 @@ class Matchup(models.Model):
 
     def __str__(self):
         return self.short_name
-        
+
+
+class PickGroup(models.Model):
+    title = models.CharField(max_length=50)
+    owner = models.OneToOneField(User, blank=True, related_name='owner_of', on_delete=models.CASCADE)
+    members = models.ManyToManyField(User, blank=True, related_name='pick_groups')
+
+    def __str__(self):
+        return self.title
