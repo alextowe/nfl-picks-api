@@ -10,11 +10,4 @@ class Migration(migrations.Migration):
         ('base', '0040_rename_is_canceled_friendrequest_was_canceled'),
     ]
 
-    operations = [
-        migrations.AlterModelManagers(
-            name='user',
-            managers=[
-                ('objects', base.managers.UserManager()),
-            ],
-        ),
-    ]
+    

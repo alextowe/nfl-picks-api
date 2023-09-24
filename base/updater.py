@@ -5,13 +5,14 @@ from .services import get_matchups, update_score
 
 
 def set_matchup_schedules():
-    matchup_dates = Matchup.objects.filter(completed=False).datetimes('date', 'minute')
+    matchups = Matchup.active_objects
     scheduler = BackgroundScheduler()
     scheduler.start()
-
-    for day in matchup_dates.dates('date', 'day'):
-        earliest_matchup = matchup_dates.filter(date__date=day).earliest('date')
-        latest_matchup = matchup_dates.filter(date__date=day).latest('date')
+    
+    for day in matchups.get_dates():
+        earliest_matchup = matchups.get_earliest(day)
+        latest_matchup = matchups.get_latest(day)
+        
         scheduler.add_job(
             update_score, 
             'interval',
@@ -19,9 +20,6 @@ def set_matchup_schedules():
             end_date=latest_matchup + timedelta(hours=5),
             minutes=3
         )
-
-    for t in scheduler.get_jobs():
-        print(t)
 
 def start_schedules():
     scheduler = BackgroundScheduler()

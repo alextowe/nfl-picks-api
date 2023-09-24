@@ -11,12 +11,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterModelManagers(
-            name='user',
-            managers=[
-                ('objects', base.managers.UserManager()),
-            ],
-        ),
         migrations.RenameField(
             model_name='user',
             old_name='following',

@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from django.utils.translation import gettext_lazy as _
 from .models import Matchup, PickGroup
 from django.contrib.auth import get_user_model
 User = get_user_model()
@@ -10,6 +11,24 @@ class UserAdmin(UserAdmin):
     list_display_links = ('id', 'username', 'email')
     search_field = ('id', 'username', 'email')
     ordering = ('id',)
+    fieldsets = (
+        (None, {'fields': ('username', 'password')}),
+        (_('Personal info'), {'fields': ('first_name', 'last_name', 'email')}),
+        (
+            _('Permissions'),
+            {
+                'fields': (
+                    'is_active',
+                    'is_staff',
+                    'is_superuser',
+                    'groups',
+                    'user_permissions',
+                ),
+            },
+        ),
+        (_('Following list'), {'fields': ('following',)}),
+        (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
+    )
     add_fieldsets = (
         (
             None,
