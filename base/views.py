@@ -19,27 +19,27 @@ def api_root(request, format=None):
     })
 
 class UserListView(generics.ListCreateAPIView):
-    queryset = User.objects.all()
+    queryset = User.objects.all().order_by('id')
     serializer_class = UserSerializer
 
 class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = User.objects.all()
+    queryset = User.objects.all().order_by('id')
     serializer_class = UserSerializer
     permission_classes = [IsOwner]
 
 class MatchupListView(generics.ListAPIView):
-    queryset = Matchup.objects.all()
+    queryset = Matchup.objects.all().order_by('id')
     serializer_class = MatchupSerializer
 
 class MatchupDetailView(generics.RetrieveAPIView):
-    queryset = Matchup.objects.all()
+    queryset = Matchup.objects.all().order_by('id')
     serializer_class = MatchupSerializer
 
 
 class PickGroupListView(generics.ListCreateAPIView):
-    queryset = PickGroup.objects.all()
+    queryset = PickGroup.objects.all().order_by('id')
     serializer_class = PickGroupSerializer
 
 class PickGroupDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = PickGroup.objects.all()
+    queryset = PickGroup.objects.all().order_by('id')
     serializer_class = PickGroupSerializer
