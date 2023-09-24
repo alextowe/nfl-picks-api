@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Matchup
+from .models import Matchup, PickGroup
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
@@ -17,7 +17,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             'profile_image'
         ]
 
-class MatchUpSerializer(serializers.HyperlinkedModelSerializer):
+class MatchupSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Matchup
         fields = [
@@ -32,4 +32,15 @@ class MatchUpSerializer(serializers.HyperlinkedModelSerializer):
             'away_team',
             'home_score',
             'away_score'
+        ]
+
+class PickGroupSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = PickGroup
+        fields = [
+            'url', 
+            'id',
+            'title',
+            'owner', 
+            'members'
         ]
