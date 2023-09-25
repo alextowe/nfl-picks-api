@@ -1,4 +1,6 @@
 from django.db import models
+from django.utils import timezone
+from datetime import datetime
 
 
 class ActiveMatchupManager(models.Manager):
@@ -12,6 +14,13 @@ class ActiveMatchupManager(models.Manager):
         """
 
         return super().get_queryset().filter(completed=False)
+
+    def get_current(self, uid):
+        """
+        Returns an active matchup for the current day.
+        """
+
+        return self.get_queryset().filter(date__date=timezone.make_aware(datetime.now()), uid=uid).first()
 
     def get_dates(self):
         """
@@ -38,6 +47,6 @@ class ActiveMatchupManager(models.Manager):
         """
         Returns latest matchup for a given day.
         """
-        
+
         return self.filter(date__date=day).datetimes('date', 'minute').latest('date')
 

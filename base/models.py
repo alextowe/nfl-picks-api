@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
-from datetime import datetime
+from django.utils import timezone
 from base.managers import ActiveMatchupManager
 
 
@@ -49,8 +49,8 @@ class Matchup(models.Model):
     away_team = models.CharField(max_length=50)
     home_score = models.IntegerField()
     away_score = models.IntegerField()
-    date = models.DateTimeField(default=datetime.now)
-    last_updated = models.DateTimeField(default=datetime.now)
+    date = models.DateTimeField(default=timezone.now)
+    last_updated = models.DateTimeField(default=timezone.now)
     completed = models.BooleanField(default=False)
 
     objects = models.Manager()
