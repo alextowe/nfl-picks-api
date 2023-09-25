@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import gettext_lazy as _
-from .models import Matchup, PickGroup
+from base.models import Matchup, PickGroup
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
@@ -10,7 +10,7 @@ class UserAdmin(UserAdmin):
     """
     Admin settings for user model that includes email during signup and adds a 'following' list in the admin detail.
     """
-    
+
     list_display = ('id', 'username', 'email', 'is_active', 'is_staff', 'is_superuser')
     list_display_links = ('id', 'username', 'email')
     search_field = ('id', 'username', 'email')
@@ -51,9 +51,9 @@ class MatchupAdmin(admin.ModelAdmin):
     Admin settings for the matchup model.
     """
 
-    list_display = ('id', 'short_name', 'week', 'year', 'away_score', 'home_score', 'date', 'completed')
-    list_display_links = ('id', 'short_name', 'week', 'year','away_score', 'home_score', 'date', 'completed')
-    search_field = ('id', 'short_name', 'week', 'year', 'completed', 'date')
+    list_display = ('id', 'short_name', 'week', 'year', 'away_score', 'home_score', 'date', 'last_updated',  'completed')
+    list_display_links = ('id', 'short_name', 'week', 'year','away_score', 'home_score', 'date', 'last_updated', 'completed')
+    search_field = ('id', 'short_name', 'week', 'year', 'completed', 'last_updated', 'date')
     ordering = ('id',)
     list_per_page = 25
 

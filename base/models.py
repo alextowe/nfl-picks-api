@@ -1,7 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
-from .managers import ActiveMatchupManager
+from datetime import datetime
+from base.managers import ActiveMatchupManager
 
 
 class User(AbstractUser, PermissionsMixin):
@@ -28,7 +29,7 @@ class User(AbstractUser, PermissionsMixin):
         """
         Returns a list of users that have a given user in their 'following' list. 
         """
-        
+
         return self.followers.all()
 
     def __str__(self):
@@ -48,7 +49,8 @@ class Matchup(models.Model):
     away_team = models.CharField(max_length=50)
     home_score = models.IntegerField()
     away_score = models.IntegerField()
-    date = models.DateTimeField(blank=True)
+    date = models.DateTimeField(default=datetime.now)
+    last_updated = models.DateTimeField(default=datetime.now)
     completed = models.BooleanField(default=False)
 
     objects = models.Manager()

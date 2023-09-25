@@ -1,10 +1,10 @@
-from base.permissions import IsOwner, IsOwnerOrReadOnly
-from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view
-from rest_framework import generics, reverse
-from base.serializers import UserSerializer, MatchupSerializer, PickGroupSerializer
 from rest_framework.response import Response
-from .models import Matchup, PickGroup
+from rest_framework import generics, reverse
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from base.serializers import UserSerializer, MatchupSerializer, PickGroupSerializer
+from base.permissions import IsOwner, IsOwnerOrReadOnly
+from base.models import Matchup, PickGroup
 from django.contrib.auth import get_user_model
 User = get_user_model()
 

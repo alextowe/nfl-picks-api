@@ -1,14 +1,14 @@
-from .models import Matchup
 import requests
 from datetime import datetime
 from dateutil import parser
+from base.models import Matchup
 
 
 def get_matchups():
     """
     Gets matchups for the current week and saves them to new matchups instances. 
     """
-    
+
     url = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard'
     r = requests.get(url)
 
@@ -50,5 +50,6 @@ def update_score():
             if not matchup.completed:
                 matchup.home_score = event['competitions'][0]['competitors'][0]['score']
                 matchup.away_score = event['competitions'][0]['competitors'][1]['score']
+                matchup.last_updated = datetime.now()
                 matchup.completed = event['status']['type']['completed']
                 matchup.save()
