@@ -5,6 +5,10 @@ from dateutil import parser
 
 
 def get_matchups():
+    """
+    Gets matchups for the current week and saves them to new matchups instances. 
+    """
+    
     url = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard'
     r = requests.get(url)
 
@@ -30,6 +34,10 @@ def get_matchups():
                 matchup.save()           
 
 def update_score():
+    """
+    Updates matchup scores for the current day.
+    """
+
     date = datetime.now().strftime('%Y%m%d')
     url = f'https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates={date}'
     r = requests.get(url)
@@ -38,7 +46,7 @@ def update_score():
         data = r.json()
         events = data['events']
         for event in events:
-            matchup = Matchup.objects.get(uid=event['uid'])
+            matchup = Matchup.active_objects.get(uid=event['uid'])
             if not matchup.completed:
                 matchup.home_score = event['competitions'][0]['competitors'][0]['score']
                 matchup.away_score = event['competitions'][0]['competitors'][1]['score']

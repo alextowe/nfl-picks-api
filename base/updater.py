@@ -5,6 +5,10 @@ from .services import get_matchups, update_score
 
 
 def set_matchup_schedules():
+    """
+    Creates new a schedule event for every day a matchup takes place. Each event starts at the time of the earliest matchup and ends 5 hours after the start of the last. All events update every 3 minutes. 
+    """
+
     matchups = Matchup.active_objects
     scheduler = BackgroundScheduler()
     scheduler.start()
@@ -22,6 +26,10 @@ def set_matchup_schedules():
         )
 
 def start_schedules():
+    """
+    Starts the schedules to get matchups and create schedule events for each day matchups take place. Both events run weekly. 
+    """
+
     scheduler = BackgroundScheduler()
     scheduler.add_job(
         get_matchups, 

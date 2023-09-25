@@ -3,15 +3,23 @@ import environ, os
 from django.contrib.messages import constants as messages
 from django.forms.renderers import TemplatesSetting
 
-# set default debug value to false
+
+# Set default debug value to false
+
 env = environ.Env(DEBUG=(bool, False))
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+
+# Build paths inside the project like this: BASE_DIR / 'subdir'
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 # Read variables from .env file
+
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
+
+# Set 'SECRET_KEY', 'DEBUG' and 'ALLOWED_HOSTS' from envrionment variables 
 
 SECRET_KEY = env('SECRET_KEY')
 
