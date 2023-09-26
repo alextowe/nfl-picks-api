@@ -84,14 +84,16 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         """
         Updates a user instance.
         """
+        if 'password' in validated_data:
+            password = validated_data.pop('password')
+            instance.set_password(password)
 
         instance.username = validated_data.get('username', instance.username)
         instance.email = validated_data.get('email', instance.email)
-        instance.password = validated_data.get('password', instance.password)
         instance.description = validated_data.get('description', instance.description)
         instance.profile_image = validated_data.get('profile_image', instance.profile_image)
-        
-        return instance
+        instance.save()
+        return super().update(instance, validated_data)
 
 class MatchupSerializer(serializers.HyperlinkedModelSerializer):
     """
