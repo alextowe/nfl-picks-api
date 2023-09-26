@@ -10,5 +10,7 @@ urlpatterns = format_suffix_patterns([
     path('matchups', views.MatchupListView.as_view(), name='matchup-list'),
     path('matchups/<int:pk>', views.MatchupDetailView.as_view(), name='matchup-detail'),
     path('groups', views.PickGroupListView.as_view(), name='pickgroup-list'),
-    path('groups/<int:pk>', views.PickGroupDetailView.as_view(), name='pickgroup-detail')
+    path('groups/<int:pk>', views.PickGroupDetailView.as_view(), name='pickgroup-detail'),
+    path('picks', views.PickListView.as_view(), name='pick-list'),
+    path('picks/<int:pk>', views.PickDetailView.as_view(), name='pick-detail')
 ])

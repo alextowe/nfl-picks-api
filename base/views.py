@@ -2,9 +2,9 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import generics, reverse
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from base.serializers import UserSerializer, MatchupSerializer, PickGroupSerializer
+from base.serializers import UserSerializer, MatchupSerializer, PickGroupSerializer, PickSerializer
 from base.permissions import IsOwner, IsOwnerOrReadOnly
-from base.models import Matchup, PickGroup
+from base.models import Matchup, PickGroup, Pick
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
@@ -18,7 +18,8 @@ def api_root(request, format=None):
     return Response({
         'users': reverse.reverse('user-list', request=request, format=format),
         'matchups': reverse.reverse('matchup-list', request=request, format=format),
-        'groups': reverse.reverse('pickgroup-list', request=request, format=format)
+        'groups': reverse.reverse('pickgroup-list', request=request, format=format),
+        'picks': reverse.reverse('pick-list', request=request, format=format)
     })
 
 class UserListView(generics.ListCreateAPIView):
@@ -28,7 +29,7 @@ class UserListView(generics.ListCreateAPIView):
 
     queryset = User.objects.all().order_by('id')
     serializer_class = UserSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [AllowAny,]
 
 class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
@@ -37,7 +38,7 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     queryset = User.objects.all().order_by('id')
     serializer_class = UserSerializer
-    permission_classes = [IsOwnerOrReadOnly]
+    permission_classes = [IsOwnerOrReadOnly,]
 
 class MatchupListView(generics.ListAPIView):
     """
@@ -71,4 +72,21 @@ class PickGroupDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     queryset = PickGroup.objects.all().order_by('id')
     serializer_class = PickGroupSerializer
-    permission_classes = [IsOwnerOrReadOnly]
+    permission_classes = [IsOwnerOrReadOnly,]
+
+class PickListView(generics.ListCreateAPIView):
+    """
+    List view for pick model.
+    """
+
+    queryset = Pick.objects.all().order_by('id')
+    serializer_class = PickSerializer
+
+class PickDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Detail view for pick model.
+    """
+
+    queryset = Pick.objects.all().order_by('id')
+    serializer_class = PickSerializer
+    permission_classes = [IsOwnerOrReadOnly,]

@@ -1,7 +1,7 @@
 import re
 from rest_framework import serializers
 from rest_framework.utils import model_meta
-from base.models import Matchup, PickGroup
+from base.models import Matchup, PickGroup, Pick
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
@@ -127,4 +127,21 @@ class PickGroupSerializer(serializers.HyperlinkedModelSerializer):
             'title',
             'owner', 
             'members'
+        ]
+
+class PickSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    Serializer for the pick model. 
+    """
+
+    class Meta:
+        model = Pick
+        fields = [
+            'url', 
+            'id',
+            'owner',
+            'pick_group',
+            'matchup',
+            'selection',
+            'is_correct'
         ]
