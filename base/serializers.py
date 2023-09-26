@@ -1,3 +1,4 @@
+import re
 from rest_framework import serializers
 from rest_framework.utils import model_meta
 from base.models import Matchup, PickGroup
@@ -10,11 +11,11 @@ class PrivateEmailField(serializers.Field):
     Hides the email field in the user serializer if the authenticated user is not owner. 
     """
 
-    def get_attribute(self, user):
+    def get_attribute(self, instance):
         """
         Passes the user object to the 'to_representation' function.
         """
-        return user
+        return instance
 
     def to_representation(self, user):
         """
@@ -24,6 +25,21 @@ class PrivateEmailField(serializers.Field):
             return ""
         else:
             return user.email
+
+    def to_internal_value(self, data):
+        """
+        
+        """
+        regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
+
+        if not re.match(regex, data):
+            raise serializers.ValidationError('Incorrect format. Expected `name@example.com`.')
+
+        if not isinstance(data, str):
+            msg = 'Incorrect type. Expected a string, but got %s'
+            raise serializers.ValidationError(msg % type(data).__name__)
+
+        return data
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     """
@@ -63,6 +79,19 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
         user = User.objects.create_user(**validated_data)
         return user
+
+    def update(self, instance, validated_data):
+        """
+        Updates a user instance.
+        """
+
+        instance.username = validated_data.get('username', instance.username)
+        instance.email = validated_data.get('email', instance.email)
+        instance.password = validated_data.get('password', instance.password)
+        instance.description = validated_data.get('description', instance.description)
+        instance.profile_image = validated_data.get('profile_image', instance.profile_image)
+        
+        return instance
 
 class MatchupSerializer(serializers.HyperlinkedModelSerializer):
     """

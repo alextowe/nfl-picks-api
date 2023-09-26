@@ -71,3 +71,4 @@ class PickGroupDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     queryset = PickGroup.objects.all().order_by('id')
     serializer_class = PickGroupSerializer
+    permission_classes = [IsOwnerOrReadOnly]
