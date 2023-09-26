@@ -27,7 +27,7 @@ class User(AbstractUser, PermissionsMixin):
     
     def get_followers(self):
         """
-        Returns a list of users that have a given user in their 'following' list. 
+        Returns a list of users that have a given user in their 'following' list.
         """
 
         return self.followers.all()

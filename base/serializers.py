@@ -5,11 +5,33 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
+class PrivateEmailField(serializers.Field):
+    """
+    Hides the email field in the user serializer if the authenticated user is not owner. 
+    """
+
+    def get_attribute(self, user):
+        """
+        Passes the user object to the 'to_representation' function.
+        """
+        return user
+
+    def to_representation(self, user):
+        """
+        Returns email if authenticted user matches the object being viewed. 
+        """
+        if user != self.context['request'].user:
+            return ""
+        else:
+            return user.email
+
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     """
     Serializer for the user model. 
     """
 
+    email = PrivateEmailField()
+    
     class Meta:
         model = User
         fields = [
