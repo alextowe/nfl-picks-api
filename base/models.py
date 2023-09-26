@@ -5,6 +5,12 @@ from django.utils import timezone
 from base.managers import ActiveMatchupManager
 
 
+CHOICES =(
+    ("1", "Home"),
+    ("2", "Away"),
+)
+
+
 class User(AbstractUser, PermissionsMixin):
     """
     User model that sets 'username' and 'email' to unique, creates a user following/followers system, and stores profile information. 'email' is also a required field. 
@@ -65,8 +71,19 @@ class PickGroup(models.Model):
     """
 
     title = models.CharField(max_length=50)
-    owner = models.ForeignKey(User, blank=True, related_name='owner_of', on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, blank=True, related_name='owner_of_groups', on_delete=models.CASCADE)
     members = models.ManyToManyField(User, blank=True, related_name='pick_groups')
 
     def __str__(self):
         return self.title
+
+class Pick(models.Model):
+    """
+    Pick model. 
+    """
+
+    owner = models.ForeignKey(User, blank=True, related_name='owner_of_picks', on_delete=models.CASCADE)
+    pick_group = models.ForeignKey(PickGroup, blank=True, related_name='owner_of', on_delete=models.CASCADE)
+    matchup = models.ForeignKey(Matchup, blank=True, related_name='owner_of', on_delete=models.CASCADE)
+    selection = models.CharField(choices = CHOICES)
+    is_correct = models.BooleanField(default=False)

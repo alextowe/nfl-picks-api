@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import gettext_lazy as _
-from base.models import Matchup, PickGroup
+from base.models import Matchup, PickGroup, Pick
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
@@ -71,3 +71,16 @@ class PickGroupAdmin(admin.ModelAdmin):
     list_per_page = 25
 
 admin.site.register(PickGroup, PickGroupAdmin)
+
+class PickAdmin(admin.ModelAdmin):
+    """
+    Admin settings for the pick group model.
+    """
+
+    list_display = ('id', 'owner')
+    list_display_links = ('id', 'owner')
+    search_field = ('id', 'owner')
+    ordering = ('id',)
+    list_per_page = 25
+
+admin.site.register(Pick, PickAdmin)
