@@ -28,7 +28,7 @@ class PrivateEmailField(serializers.Field):
 
     def to_internal_value(self, data):
         """
-        
+        Check the provided email format. 
         """
         regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
 
@@ -47,7 +47,12 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
     """
 
     email = PrivateEmailField()
-    
+    password = serializers.CharField(
+        style = {'input_type': 'password'},
+        write_only = True,
+        required = False
+    )
+
     class Meta:
         model = User
         fields = [
@@ -60,9 +65,6 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             'description',
             'profile_image'
         ]
-        extra_kwargs = {
-            'password': {'write_only': True},
-        }
     
     def create(self, validated_data):
         """
@@ -77,8 +79,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             if relation_info.to_many and (field_name in validated_data):
                 many_to_many[field_name] = validated_data.pop(field_name)
 
-        user = User.objects.create_user(**validated_data)
-        return user
+        return User.objects.create_user(**validated_data)
 
     def update(self, instance, validated_data):
         """
@@ -88,11 +89,6 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             password = validated_data.pop('password')
             instance.set_password(password)
 
-        instance.username = validated_data.get('username', instance.username)
-        instance.email = validated_data.get('email', instance.email)
-        instance.description = validated_data.get('description', instance.description)
-        instance.profile_image = validated_data.get('profile_image', instance.profile_image)
-        instance.save()
         return super().update(instance, validated_data)
 
 class MatchupSerializer(serializers.HyperlinkedModelSerializer):
