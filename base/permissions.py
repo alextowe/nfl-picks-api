@@ -1,4 +1,5 @@
 from rest_framework import permissions
+from base.models import User
 
 
 class IsOwner(permissions.BasePermission):
@@ -11,7 +12,10 @@ class IsOwner(permissions.BasePermission):
         Checks if user is owner of object.
         """
         
-        return obj == request.user
+        if hasattr(obj, 'owner'):
+            return obj.owner == request.user
+        
+        return obj.owner == request.user
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
     """
@@ -25,5 +29,8 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
 
         if request.method in permissions.SAFE_METHODS:
             return True
+        
+        if hasattr(obj, 'owner'):
+            return obj.owner == request.user
 
         return obj == request.user
