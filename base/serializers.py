@@ -134,6 +134,16 @@ class PickGroupSerializer(serializers.HyperlinkedModelSerializer):
             'members'
         ]
 
+    def create(self, validated_data):
+        """
+        Creates a new pick group. Sets the authenticated user as the owner and as a member. 
+        """
+        
+        members = validated_data.pop('members')
+        pick_group = PickGroup.objects.create(owner=self.context['request'].user, **validated_data)
+        pick_group.members.add(self.context['request'].user, *members)
+        return pick_group
+
 class PickSerializer(serializers.HyperlinkedModelSerializer):
     """
     Serializer for the pick model. 

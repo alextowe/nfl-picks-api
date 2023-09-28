@@ -75,9 +75,6 @@ class PickGroupListView(generics.ListCreateAPIView):
             Q(members=self.request.user)
         ).order_by('id')
 
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
-
 class PickGroupDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
     Detail view for pick group model.
