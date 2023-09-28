@@ -64,9 +64,9 @@ class PickGroupAdmin(admin.ModelAdmin):
     Admin settings for the pick group model.
     """
 
-    list_display = ('id', 'title', 'owner')
-    list_display_links = ('id', 'title', 'owner')
-    search_field = ('id', 'title', 'owner')
+    list_display = ('id', 'title', 'owner', 'can_invite')
+    list_display_links = ('id', 'title', 'owner', 'can_invite')
+    search_field = ('id', 'title', 'owner', 'can_invite')
     ordering = ('id',)
     list_per_page = 25
 

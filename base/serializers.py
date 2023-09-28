@@ -15,12 +15,14 @@ class PrivateEmailField(serializers.Field):
         """
         Passes the user object to the 'to_representation' function.
         """
+
         return instance
 
     def to_representation(self, user):
         """
         Returns email if authenticted user matches the object being viewed. 
         """
+
         if user != self.context['request'].user:
             return ""
         else:
@@ -30,6 +32,7 @@ class PrivateEmailField(serializers.Field):
         """
         Check the provided email format. 
         """
+
         regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
 
         if not re.match(regex, data):
@@ -123,6 +126,7 @@ class PickGroupSerializer(serializers.HyperlinkedModelSerializer):
         view_name = 'user-detail',
         read_only=True 
     )
+    can_invite = serializers.BooleanField(default=True)
     
     class Meta:
         model = PickGroup
@@ -131,14 +135,15 @@ class PickGroupSerializer(serializers.HyperlinkedModelSerializer):
             'id',
             'title',
             'owner', 
-            'members'
+            'members',
+            'can_invite'
         ]
 
     def create(self, validated_data):
         """
         Creates a new pick group. Sets the authenticated user as the owner and as a member. 
         """
-        
+
         members = validated_data.pop('members')
         pick_group = PickGroup.objects.create(owner=self.context['request'].user, **validated_data)
         pick_group.members.add(self.context['request'].user, *members)
