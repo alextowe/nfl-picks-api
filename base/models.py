@@ -83,8 +83,8 @@ class Pick(models.Model):
     """
 
     owner = models.ForeignKey(User, blank=True, related_name='owner_of_picks', on_delete=models.CASCADE)
-    pick_group = models.ForeignKey(PickGroup, blank=True, related_name='owner_of', on_delete=models.CASCADE)
-    matchup = models.ForeignKey(Matchup, blank=True, related_name='owner_of', on_delete=models.CASCADE)
+    pick_group = models.ForeignKey(PickGroup, blank=True, related_name='picks_for_group', on_delete=models.CASCADE)
+    matchup = models.ForeignKey(Matchup, blank=True, related_name='picks_for_matchup', on_delete=models.CASCADE)
     selection = models.CharField(choices = CHOICES)
     is_correct = models.BooleanField(default=False)
 
