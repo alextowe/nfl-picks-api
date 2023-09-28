@@ -119,6 +119,11 @@ class PickGroupSerializer(serializers.HyperlinkedModelSerializer):
     Serializer for the pick group model. 
     """
 
+    owner = serializers.HyperlinkedRelatedField(
+        view_name = 'user-detail',
+        read_only=True 
+    )
+    
     class Meta:
         model = PickGroup
         fields = [

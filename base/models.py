@@ -87,3 +87,5 @@ class Pick(models.Model):
     matchup = models.ForeignKey(Matchup, blank=True, related_name='owner_of', on_delete=models.CASCADE)
     selection = models.CharField(choices = CHOICES)
     is_correct = models.BooleanField(default=False)
+
+    

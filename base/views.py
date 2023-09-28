@@ -2,6 +2,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import generics, reverse
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from django.db.models import Q
 from base.serializers import UserSerializer, MatchupSerializer, PickGroupSerializer, PickSerializer
 from base.permissions import IsOwner, IsOwnerOrReadOnly
 from base.models import Matchup, PickGroup, Pick
@@ -62,8 +63,20 @@ class PickGroupListView(generics.ListCreateAPIView):
     List view for pick group model.
     """
 
-    queryset = PickGroup.objects.all().order_by('id')
     serializer_class = PickGroupSerializer
+
+    def get_queryset(self):
+        """
+        Filters pick groups that the authenitcated user is a part of. 
+        """
+
+        return PickGroup.objects.filter(
+            Q(owner=self.request.user) | 
+            Q(members=self.request.user)
+        ).order_by('id')
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
 
 class PickGroupDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
