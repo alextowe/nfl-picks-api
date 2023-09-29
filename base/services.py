@@ -2,7 +2,7 @@ import requests
 from django.utils import timezone
 from datetime import datetime
 from dateutil import parser
-from base.models import Matchup
+from base.models import Matchup, PickGroup, Pick
 
 
 def get_matchups():
@@ -32,7 +32,13 @@ def get_matchups():
                     date = parser.parse(event['date']),
                     completed = event['status']['type']['completed']
                 )
-                matchup.save()           
+                matchup.save()
+
+    for group in PickGroup.objects.all():
+        for member in group.members.all():
+            for matchup in Matchup.active_objects.all():
+                if not Pick.objects.filter(owner=member, pick_group=group, matchup=matchup).exists():
+                    pick = Pick.objects.create(owner=member, pick_group=group, matchup=matchup)        
 
 def update_score():
     """

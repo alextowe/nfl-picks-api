@@ -37,7 +37,7 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     Detail view for user model.
     """
 
-    queryset = User.objects.all().order_by('id')
+    queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsOwnerOrReadOnly,]
 
@@ -54,7 +54,7 @@ class MatchupDetailView(generics.RetrieveAPIView):
     Detail view for matchup model.
     """
 
-    queryset = Matchup.objects.all().order_by('id')
+    queryset = Matchup.objects.all()
     serializer_class = MatchupSerializer
 
 
@@ -70,17 +70,14 @@ class PickGroupListView(generics.ListCreateAPIView):
         Filters pick groups that the authenitcated user is a part of. 
         """
 
-        return PickGroup.objects.filter(
-            Q(owner=self.request.user) | 
-            Q(members=self.request.user)
-        ).order_by('id')
+        return PickGroup.objects.filter(members=self.request.user).order_by('id')
 
 class PickGroupDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
     Detail view for pick group model.
     """
 
-    queryset = PickGroup.objects.all().order_by('id')
+    queryset = PickGroup.objects.all()
     serializer_class = PickGroupSerializer
     permission_classes = [IsOwnerOrReadOnly,]
 
@@ -89,14 +86,23 @@ class PickListView(generics.ListCreateAPIView):
     List view for pick model.
     """
 
-    queryset = Pick.objects.all().order_by('id')
     serializer_class = PickSerializer
+
+    def get_queryset(self):
+        """
+        Filters picks that the authenitcated user owns. 
+        """
+
+        return Pick.objects.filter(
+            Q(owner=self.request.user) |
+            Q(pick_group__in=self.request.user.pick_groups.all())        
+        ).order_by('id')
 
 class PickDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
     Detail view for pick model.
     """
 
-    queryset = Pick.objects.all().order_by('id')
+    queryset = Pick.objects.all()
     serializer_class = PickSerializer
     permission_classes = [IsOwnerOrReadOnly,]

@@ -88,6 +88,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         """
         Updates a user instance.
         """
+
         if 'password' in validated_data:
             password = validated_data.pop('password')
             instance.set_password(password)
@@ -120,14 +121,8 @@ class MatchupSerializer(serializers.HyperlinkedModelSerializer):
 class PickGroupSerializer(serializers.HyperlinkedModelSerializer):
     """
     Serializer for the pick group model. 
-    """
+    """ 
 
-    owner = serializers.HyperlinkedRelatedField(
-        view_name = 'user-detail',
-        read_only=True 
-    )
-    can_invite = serializers.BooleanField(default=True)
-    
     class Meta:
         model = PickGroup
         fields = [
@@ -136,8 +131,12 @@ class PickGroupSerializer(serializers.HyperlinkedModelSerializer):
             'title',
             'owner', 
             'members',
-            'can_invite'
+            'picks_for_group'
         ]
+        extra_kwargs = {
+            'owner': {'read_only': True}
+            
+        }
 
     def create(self, validated_data):
         """
@@ -145,9 +144,26 @@ class PickGroupSerializer(serializers.HyperlinkedModelSerializer):
         """
 
         members = validated_data.pop('members')
+        picks_for_group = validated_data.pop('picks_for_group')
         pick_group = PickGroup.objects.create(owner=self.context['request'].user, **validated_data)
         pick_group.members.add(self.context['request'].user, *members)
+        
+        for matchup in Matchup.active_objects.all():
+            pick = Pick.objects.create(owner=self.context['request'].user, pick_group=pick_group, matchup=matchup)
+
         return pick_group
+
+    def update(self, instance, validated_data):
+        """
+        Updates a pick group instance.
+        """
+        
+        for member in validated_data['members']:
+            for matchup in Matchup.active_objects.all():
+                if not Pick.objects.filter(owner=member, pick_group=instance, matchup=matchup).exists():
+                    pick = Pick.objects.create(owner=member, pick_group=instance, matchup=matchup)
+
+        return super().update(instance, validated_data)
 
 class PickSerializer(serializers.HyperlinkedModelSerializer):
     """
@@ -165,3 +181,8 @@ class PickSerializer(serializers.HyperlinkedModelSerializer):
             'selection',
             'is_correct'
         ]
+        extra_kwargs = {
+            'owner': {'read_only': True},
+            'pick_group': {'read_only': True},
+            'matchup': {'read_only': True}
+        }

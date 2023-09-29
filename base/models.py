@@ -73,7 +73,6 @@ class PickGroup(models.Model):
     title = models.CharField(max_length=50)
     owner = models.ForeignKey(User, blank=True, related_name='owner_of_groups', on_delete=models.CASCADE)
     members = models.ManyToManyField(User, blank=True, related_name='pick_groups')
-    can_invite = models.BooleanField(default=True)
 
     def __str__(self):
         return self.title
