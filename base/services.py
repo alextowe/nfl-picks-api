@@ -66,14 +66,13 @@ def update_score():
                     elif matchup.home_score < matchup.away_score:
                         matchup.winner = '2'
 
-                    matchup.save()
-
-   
                     for pick in Pick.objects.filter(matchup=matchup):
                         if pick.selection == "":
                             print("No Selection")  
                         elif pick.selection == matchup.winner:
                             pick.is_correct = True
-                            pick.save()       
+                            pick.save()  
+
+                matchup.save()     
 
             
