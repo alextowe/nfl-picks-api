@@ -59,4 +59,21 @@ def update_score():
                 matchup.away_score = event['competitions'][0]['competitors'][1]['score']
                 matchup.last_updated = timezone.make_aware(datetime.now())
                 matchup.completed = event['status']['type']['completed']
-                matchup.save()
+
+                if matchup.completed:
+                    if matchup.home_score > matchup.away_score:
+                        matchup.winner = '1'
+                    elif matchup.home_score < matchup.away_score:
+                        matchup.winner = '2'
+
+                    matchup.save()
+
+   
+                    for pick in Pick.objects.filter(matchup=matchup):
+                        if pick.selection == "":
+                            print("No Selection")  
+                        elif pick.selection == matchup.winner:
+                            pick.is_correct = True
+                            pick.save()       
+
+            
