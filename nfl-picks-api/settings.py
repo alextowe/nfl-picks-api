@@ -51,7 +51,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'pickem.urls'
+ROOT_URLCONF = 'nfl-picks-api.urls'
 
 TEMPLATES = [
     {
@@ -69,7 +69,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'pickem.wsgi.application'
+WSGI_APPLICATION = 'nfl-api-picks.wsgi.application'
 
 
 # Database
