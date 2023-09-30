@@ -45,14 +45,14 @@ def update_score():
     """
 
     date = timezone.make_aware(datetime.now()).strftime('%Y%m%d')
-    url = f'https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates={date}'
+    url = f'https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard'#?dates={date}'
     r = requests.get(url)
     
     if r.status_code == 200:
         data = r.json()
         events = data['events']
         for event in events:
-            matchup = Matchup.active_objects.get_current(event['uid'])
+            matchup = Matchup.active_objects.get(uid=event['uid'])#get_current(event['uid'])
             if matchup:
                 matchup.home_score = event['competitions'][0]['competitors'][0]['score']
                 matchup.away_score = event['competitions'][0]['competitors'][1]['score']

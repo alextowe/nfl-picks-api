@@ -14,5 +14,5 @@ class APIConfig(AppConfig):
         Imports the updater module and starts running schedules.
         """
         
-        from . import updater
-        updater.start_schedules()
+        from api import schedules
+        schedules.start_schedules()
