@@ -34,11 +34,10 @@ def get_matchups():
                 )
                 matchup.save()
 
-    for group in PickGroup.objects.all():
-        for member in group.members.all():
-            for matchup in Matchup.active_objects.all():
-                if not Pick.objects.filter(owner=member, pick_group=group, matchup=matchup).exists():
-                    pick = Pick.objects.create(owner=member, pick_group=group, matchup=matchup)        
+                for group in PickGroup.objects.all():
+                    for member in group.members.all():
+                        if not Pick.objects.filter(owner=member, pick_group=group, matchup=matchup).exists():
+                            pick = Pick.objects.create(owner=member, pick_group=group, matchup=matchup)        
 
 def update_score():
     """
@@ -59,7 +58,7 @@ def update_score():
                 matchup.away_score = event['competitions'][0]['competitors'][1]['score']
                 matchup.last_updated = timezone.make_aware(datetime.now())
                 matchup.completed = event['status']['type']['completed']
-
+                print(matchup.completed)
                 if matchup.completed:
                     if matchup.home_score > matchup.away_score:
                         matchup.winner = '1'
