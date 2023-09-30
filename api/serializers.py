@@ -1,7 +1,7 @@
 import re
 from rest_framework import serializers
 from rest_framework.utils import model_meta
-from base.models import Matchup, PickGroup, Pick
+from api.models import Matchup, PickGroup, Pick
 from django.contrib.auth import get_user_model
 User = get_user_model()
 

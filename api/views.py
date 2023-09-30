@@ -3,9 +3,9 @@ from rest_framework.response import Response
 from rest_framework import generics, reverse
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.db.models import Q
-from base.serializers import UserSerializer, MatchupSerializer, PickGroupSerializer, PickSerializer
-from base.permissions import IsOwner, IsOwnerOrReadOnly
-from base.models import Matchup, PickGroup, Pick
+from api.serializers import UserSerializer, MatchupSerializer, PickGroupSerializer, PickSerializer
+from api.permissions import IsOwner, IsOwnerOrReadOnly
+from api.models import Matchup, PickGroup, Pick
 from django.contrib.auth import get_user_model
 User = get_user_model()
 

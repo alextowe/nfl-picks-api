@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'base.apps.BaseConfig',
+    'api.apps.APIConfig',
 ]
 
 MIDDLEWARE = [
@@ -107,7 +107,7 @@ USE_I18N = True
 
 USE_TZ = True
 
-AUTH_USER_MODEL = 'base.User'
+AUTH_USER_MODEL = 'api.User'
 
 AUTHENTICATION_BACKENDS = ["django.contrib.auth.backends.AllowAllUsersModelBackend"]
 

@@ -1,7 +1,7 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import timedelta
-from base.models import Matchup
-from base.services import get_matchups, update_score
+from api.models import Matchup
+from api.services import get_matchups, update_score
 
 
 def set_matchup_schedules():

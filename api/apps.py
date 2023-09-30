@@ -1,13 +1,13 @@
 from django.apps import AppConfig
 
 
-class BaseConfig(AppConfig):
+class APIConfig(AppConfig):
     """
-    Configuration for app: base. 
+    Configuration for app: api. 
     """
 
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'base'
+    name = 'api'
     
     def ready(self):
         """

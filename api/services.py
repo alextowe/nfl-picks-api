@@ -2,7 +2,7 @@ import requests
 from django.utils import timezone
 from datetime import datetime
 from dateutil import parser
-from base.models import Matchup, PickGroup, Pick
+from api.models import Matchup, PickGroup, Pick
 
 
 def get_matchups():
@@ -58,7 +58,7 @@ def update_score():
                 matchup.away_score = event['competitions'][0]['competitors'][1]['score']
                 matchup.last_updated = timezone.make_aware(datetime.now())
                 matchup.completed = event['status']['type']['completed']
-                print(matchup.completed)
+                
                 if matchup.completed:
                     if matchup.home_score > matchup.away_score:
                         matchup.winner = '1'
