@@ -69,7 +69,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'nfl-api-picks.wsgi.application'
+WSGI_APPLICATION = 'nfl-picks-api.wsgi.application'
 
 
 # Database

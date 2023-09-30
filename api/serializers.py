@@ -115,7 +115,8 @@ class MatchupSerializer(serializers.HyperlinkedModelSerializer):
             'home_score',
             'away_score',
             'date',
-            'completed'
+            'completed',
+            'winner'
         ]
 
 class PickGroupSerializer(serializers.HyperlinkedModelSerializer):
