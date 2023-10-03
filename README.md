@@ -74,4 +74,4 @@ The information stored for each pick:
 - **pick_group** - group for the pick
 - **matchup** - matchup for the pick
 - **selection** - selection made by the user
-- **is_correct** - boolean field to determine if the pick is correct for not
+- **is_correct** - boolean field to determine if the pick is correct or not
